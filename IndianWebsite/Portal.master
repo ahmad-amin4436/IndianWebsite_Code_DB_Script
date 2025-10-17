@@ -1,0 +1,703 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Portal.master.cs" Inherits="Portal" %>
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title>COSMOSRECOG | <%: Page.Title %></title>
+
+    <!-- Favicons -->
+    <link rel="icon" href="<%= ResolveUrl("~/assets/images/favicon-cosmo.png") %>" type="image/x-icon" />
+    <link rel="apple-touch-icon-precomposed" href="<%= ResolveUrl("~/assets/images/apple-touch-icon-72x72-precomposed.png") %>" sizes="72x72" />
+    <link rel="apple-touch-icon-precomposed" href="<%= ResolveUrl("~/assets/images/apple-touch-icon-114x114-precomposed.png") %>" sizes="114x114" />
+    <link rel="apple-touch-icon-precomposed" href="<%= ResolveUrl("~/assets/images/apple-touch-icon-144x144-precomposed.png") %>" sizes="144x144" />
+    <link rel="apple-touch-icon-precomposed" href="<%= ResolveUrl("~/assets/images/apple-touch-icon-precomposed.png") %>" />
+
+    <!-- Bootstrap CSS -->
+    <link href="<%= ResolveUrl("~/assets/vendor/bootstrap/5.1.3/bootstrap.min.css") %>" rel="stylesheet" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com/" />
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Lato:wght@100;300;400;700;900&family=Poppins:wght@200;300;400;600;700;800&family=Syncopate:wght@400;700&display=swap" rel="stylesheet" />
+
+    <!-- Icon Fonts -->
+    <link href="<%= ResolveUrl("~/assets/vendor/icomoon/icomoon.min.css") %>" rel="stylesheet" />
+
+    <!-- Off Canvas Menu - Default Theme -->
+    <link href="<%= ResolveUrl("~/assets/vendor/offcanvas-nav/hc-offcanvas-nav.css") %>" rel="stylesheet" />
+
+    <!-- Theme CSS -->
+    <link href="<%= ResolveUrl("~/assets/css/theme.css") %>" rel="stylesheet" />
+    <link href="<%= ResolveUrl("~/assets/css/theme-colors.css") %>" rel="stylesheet" />
+
+    <!-- Theme Preview Only CSS -->
+    <link href="<%= ResolveUrl("~/assets/css/theme-preview-color-styler.css") %>" rel="stylesheet" />
+
+    <!-- jQuery -->
+    <script src="<%= ResolveUrl("~/assets/vendor/jquery/jquery.min.js") %>"></script>
+
+    <!-- Slick (carousel) -->
+    <link href="<%= ResolveUrl("~/assets/vendor/slick/1.8.1/slick.css") %>" rel="stylesheet" />
+    <link href="<%= ResolveUrl("~/assets/vendor/slick/1.8.1/slick-theme-skilltech.css") %>" rel="stylesheet" />
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0CK5T93V47"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-0CK5T93V47');
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var footer = document.querySelector(".styler-footer");
+            if (footer) {
+                footer.style.display = "none";
+            }
+        });
+    </script>
+
+</head>
+
+
+
+
+<body class="sk__homepage sk__home-youtube-video sk__has-youtube-video dark-shade-1-bg">
+    <form runat="server">
+        <asp:ScriptManager runat="server">
+            <Scripts>
+                <%--To learn more about bundling scripts in ScriptManager see https://go.microsoft.com/fwlink/?LinkID=301884 --%>
+                <%--Framework Scripts--%>
+                <asp:ScriptReference Name="MsAjaxBundle" />
+                <asp:ScriptReference Name="jquery" />
+                <asp:ScriptReference Name="bootstrap" />
+                <asp:ScriptReference Name="WebForms.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebForms.js" />
+                <asp:ScriptReference Name="WebUIValidation.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebUIValidation.js" />
+                <asp:ScriptReference Name="MenuStandards.js" Assembly="System.Web" Path="~/Scripts/WebForms/MenuStandards.js" />
+                <asp:ScriptReference Name="GridView.js" Assembly="System.Web" Path="~/Scripts/WebForms/GridView.js" />
+                <asp:ScriptReference Name="DetailsView.js" Assembly="System.Web" Path="~/Scripts/WebForms/DetailsView.js" />
+                <asp:ScriptReference Name="TreeView.js" Assembly="System.Web" Path="~/Scripts/WebForms/TreeView.js" />
+                <asp:ScriptReference Name="WebParts.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebParts.js" />
+                <asp:ScriptReference Name="Focus.js" Assembly="System.Web" Path="~/Scripts/WebForms/Focus.js" />
+                <asp:ScriptReference Name="WebFormsBundle" />
+                <%--Site Scripts--%>
+            </Scripts>
+        </asp:ScriptManager>
+
+        <main id="primary" class="site-main">
+
+		<!-- Master Curtain Effect -->
+		<section class="sk__master-curtain">
+			<div class="mcurtain mcurtain-left"></div>
+			<div class="mcurtain mcurtain-center"></div>
+			<div class="mcurtain mcurtain-right"></div>
+		</section>
+
+		<!-- Back to top button -->
+		<div class="sk__back-to-top-wrap">
+			<a class="sk__back-to-top" href="#smooth-content"><span class="sk__back-to-top"></span></a>
+		</div>
+
+		<!-- Navigation Menu
+		================================================== -->
+		<div class="sk__mobile-menu-bar">
+			
+ 
+		</div>
+
+
+		<!-- Dynamically controlled with JS! -->
+		<a class="sk__mobile-main-logo" href="<%= ResolveUrl("~/Default.aspx") %>">
+			<img alt="Website logo." src="<%= ResolveUrl("~/assets/images/black .png") %>">
+		</a>
+
+		<nav id="main-nav" style="opacity: 0;" class="sk__menu navbar sk__navbar navbar-expand-lg navbar-dark static-top">
+
+    <!-- Desktop Menu Logo -->
+    <a class="navbar-brand" href="<%= ResolveUrl("~/Default.aspx") %>">
+        <img id="sk__main-logo" alt="Website logo." src="<%= ResolveUrl("~/assets/images/black .png") %>">
+    </a>
+
+    <!-- The Menu -->
+    <ul class="navbar-nav ms-auto">
+
+        <!-- Dashboard -->
+        <li class="nav-item">
+            <a class="nav-link hvr-underline-from-center" href="<%= ResolveUrl("~/Portal/UserDashboard.aspx") %>">
+                <span class="sk__menu-icon"><span class="icon-grid"></span></span>Dashboard
+            </a>
+        </li>
+
+        <!-- IP Stock -->
+        <li class="nav-item">
+            <a class="nav-link hvr-underline-from-center" href="<%= ResolveUrl("~/Portal/IpStock.aspx") %>">
+                <span class="sk__menu-icon"><span class="icon-database"></span></span>IP Stock
+                <small class="text-warning">Buy Now</small>
+            </a>
+        </li>
+
+        <!-- Manage Orders -->
+        <li class="nav-item">
+            <a class="nav-link hvr-underline-from-center active" href="<%= ResolveUrl("~/Portal/ManageOrders.aspx") %>">
+                <span class="sk__menu-icon"><span class="icon-clipboard"></span></span>Manage Orders
+            </a>
+        </li>
+
+        <!-- Order History -->
+       <%-- <li class="nav-item">
+            <a class="nav-link hvr-underline-from-center" href="<%= ResolveUrl("~/Portal/OrderHistory.aspx") %>">
+                <span class="sk__menu-icon"><span class="icon-list"></span></span>Order History
+            </a>
+        </li>
+
+        <!-- Scripts -->
+        <li class="nav-item">
+            <a class="nav-link hvr-underline-from-center" href="<%= ResolveUrl("~/Portal/Scripts.aspx") %>">
+                <span class="sk__menu-icon"><span class="icon-file-text"></span></span>Scripts
+            </a>
+        </li>--%>
+
+        <!-- Account (submenu) -->
+        <li class="nav-item menu-item-has-children">
+            <a class="nav-link" href="<%= ResolveUrl("~/Portal/Profile.aspx") %>">
+                <span class="sk__menu-icon"><span class="icon-user"></span></span>Account Settings
+            </a>
+           
+        </li>
+
+        <!-- Quick Actions -->
+     <%--   <li class="nav-item">
+            <a class="nav-link hvr-underline-from-center" href="<%= ResolveUrl("~/Portal/NewOrder.aspx") %>">
+                <span class="sk__menu-icon"><span class="icon-plus"></span></span>New Order
+                <span class="text-danger">Hot</span>
+            </a>
+        </li>--%>
+
+       
+        <!-- Help & Support -->
+        <li class="nav-item">
+            <a class="nav-link" href="<%= ResolveUrl("~/Contact.aspx") %>">
+                <span class="sk__menu-icon"><span class="icon-user-tie"></span></span>Help & Support
+            </a>
+        </li>
+
+        <!-- Sign Out -->
+        <li class="nav-item">
+            <a class="nav-link signout" href="<%= ResolveUrl("~/Pages/login.aspx") %>">
+                <span class="sk__menu-icon"><span class="icon-sign-out"></span></span>Sign Out
+            </a>
+        </li>
+
+    </ul>
+</nav>
+
+		<!-- /.sk__menu -->
+
+		
+		<div id="smooth-wrapper" class="pushable-content">
+			<div id="smooth-content">
+                 <asp:ContentPlaceHolder ID="MainContent" runat="server">
+            </asp:ContentPlaceHolder>
+				
+				<!-- Footer
+				================================================== -->
+				<footer class="dark-shade-2-bg position-relative">
+
+					<div class="footer-background-container sk__absolute">
+						<div class="sk__gradient-background-tint footer-background sk__absolute"></div>
+					</div>
+					
+					<div class="container sk__supercontainer position-relative">
+
+						<div class="row footer-top">
+							<div class="col-12 col-sm-6 top-footer-logo">
+								<img src="<%= ResolveUrl("~/assets/images/black .png") %>" alt="Website logo for the footer.">
+							</div>
+							<div class="col-12 col-sm-6 top-footer-tagline">
+								<h5 class="h5-elegant">Premium <strong>Linux VPS</strong> Hosting</h5>
+							</div>
+						</div>
+
+						<span class="divider sk__subtle-divider"></span>
+
+						<div class="row footer-main text-center text-sm-start">
+							<div class="col-md-12 col-lg-6 footer-main-large-col mb-4 mb-lg-0">
+								<div class="fancy-gradient-text-box">
+									<h3 class="h3-elegant sk__gradient-fancy-text">Start your journey now.</h3>
+								</div>	
+								<p class="p-v2 mw-440">The most affordable premium Linux VPS hosting provider. We make professional hosting accessible to everyone with transparent pricing, reliable performance, and expert support.</p>
+								<h5>COSMOSRECOG</h5>
+								<p class="p-v2 mw-440"><span>Nainital Almora Road, </span><span>Uttrakhand 263132 </span><span>7972499728 </span><br /><span>Cosmosrecog@outlook.com</span></p>
+							</div>
+							<div class="col-sm-12 col-md-6 col-lg-3 footer-main-small-col widget_nav_menu">
+								<h5>COSMOSRECOG Quick Links</h5>
+								<ul>
+									<li>
+										<a href="<%= ResolveUrl("~/Portal/affordable_hosting.aspx") %>" class="footer-main-links gradient-links">Affordable Hosting</a>
+									</li>
+									<li>
+										<a href="<%= ResolveUrl("~/Portal/linux_vps_server.aspx") %>" class="footer-main-links gradient-links">Linux VPS & Servers</a>
+									</li>
+									<li>
+										<a href="<%= ResolveUrl("~/Portal/server_series.aspx") %>" class="footer-main-links gradient-links">Server Series</a>
+									</li>
+									<li>
+										<a href="<%= ResolveUrl("~/Portal/support.aspx") %>" class="footer-main-links gradient-links">24/7 Support</a>
+									</li>
+								
+								</ul>
+							</div>
+							<div class="col-sm-12 col-md-6 col-lg-3 footer-main-small-col">
+								<div class="row">
+									<div class="col">
+										<!-- Footer Social Icons Menu -->
+										<section class="footer-socials-section">
+											<h5>Follow Us & Stay Informed</h5>
+											<div class="footer-socials-inner">
+												<div class="footer-socials">
+													<a class="social-icons" href="#" target="_blank"><span><span class="icon-facebook1"></span></span></a>
+													<a class="social-icons" href="#" target="_blank"><span><span class="icon-twitter1"></span></span></a>
+													<a class="social-icons" href="#" target="_blank"><span><span class="icon-behance1"></span></span></a>
+													<a class="social-icons" href="#" target="_blank"><span><span class="icon-dribbble1"></span></span></a>
+												</div>
+											</div>
+										</section>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col">
+										<!-- Widget - Subscribe
+										================================================== -->
+										<div class="widget custom_subscribe_widget">
+											<div class="sk__widget-inner">
+												
+												<!-- Preview Only Static Form -->
+											
+											</div>
+										</div>
+										<!-- /.custom_subscribe_widget -->
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<span class="divider sk__subtle-divider"></span>
+
+						<div class="row footer-bottom">
+							<div class="col-xs-12 col-sm-6 col-md-4 text-center text-sm-start">
+								<h5>COSMOSRECOG&#8198;Server</h5>
+							</div>
+							<div class="col-12 col-md-4 order-xs-3 order-sm-3 order-md-2 text-center text-sm-start text-md-center">
+								<p class="p-footer-copyright">Copyright © 2025    <a href="https://cosmosrecogserver.com" target="_blank">cosmosrecogserver.com</a></p>
+							</div>
+							<div class="col-xs-12 col-sm-6 col-md-4 order-sm-2 order-md-3 text-center text-sm-end">
+								<a class="footer-bottom-right-links" href="#" target="_blank">Contact</a>
+							</div>
+						</div>
+					</div>
+
+				</footer>
+
+
+				<!-- Helper div for inserting before scripts
+				================================================== -->
+				<div class="sk__body-end"></div>
+
+			</div>
+			<!-- /#smooth-content -->
+
+		</div>
+		<!-- /#smooth-wrapper -->
+
+	</main>
+       
+<style>
+/* --- Enhanced DarkStar pricing styles --- */
+:root {
+  --primary: #7c5cff;
+  --secondary: #5e3dff;
+  --accent1: #ff5e5e;
+  --accent2: #00c27a;
+  --accent3: #ffaa00;
+  --dark: #121212;
+  --darker: #0a0a0a;
+  --light: #f8f9fa;
+  --gray: #6c757d;
+}
+
+.section {
+  padding: 5rem 0;
+  background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 20% 50%, rgba(124, 92, 255, 0.08) 0%, transparent 50%);
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 2px;
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-subtitle {
+  color: #aaa;
+  max-width: 600px;
+  margin: 0 auto;
+  font-size: 1.1rem;
+}
+
+.pricing-card {
+  background: linear-gradient(145deg, #1a1a1a 0%, #1e1e1e 100%);
+  border: 1px solid #2a2a2a;
+  padding: 30px;
+  border-radius: 16px;
+  text-align: center;
+  margin-bottom: 30px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.pricing-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border-radius: 8px 8px 0 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.pricing-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.pricing-card:hover::before {
+  opacity: 1;
+}
+
+.pricing-card.popular {
+  border: 1px solid rgba(124, 92, 255, 0.5);
+  box-shadow: 0 0 25px rgba(124, 92, 255, 0.2);
+}
+
+.badge-top {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: #fff;
+  padding: 6px 20px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 2;
+  box-shadow: 0 4px 10px rgba(124, 92, 255, 0.3);
+}
+
+.badge-top.best { 
+  background: var(--accent1);
+  box-shadow: 0 4px 10px rgba(255, 94, 94, 0.3);
+}
+
+.badge-top.power { 
+  background: var(--accent2);
+  box-shadow: 0 4px 10px rgba(0, 194, 122, 0.3);
+}
+
+.badge-top.titan { 
+  background: var(--accent3);
+  box-shadow: 0 4px 10px rgba(255, 170, 0, 0.3);
+}
+
+.plan-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, rgba(124, 92, 255, 0.1) 0%, rgba(94, 61, 255, 0.1) 100%);
+  color: var(--primary);
+  font-size: 30px;
+}
+
+.plan-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: var(--light);
+}
+
+.plan-desc {
+  font-size: 14px;
+  color: #aaa;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.price-box {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 20px 0 5px;
+}
+
+.old-price {
+  text-decoration: line-through;
+  color: var(--gray);
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.price {
+  color: var(--primary);
+  font-size: 42px;
+  font-weight: 800;
+}
+
+.period {
+  font-size: 16px;
+  color: #aaa;
+  font-weight: normal;
+}
+
+.save-text {
+  color: var(--accent2);
+  font-size: 14px;
+  margin: 0 0 25px;
+  font-weight: 600;
+}
+
+.specs-container {
+  background: rgba(42, 42, 42, 0.3);
+  padding: 20px;
+  border-radius: 12px;
+  margin: 20px 0;
+}
+
+.spec-title {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #888;
+  letter-spacing: 1px;
+}
+
+.spec-list, .feature-list {
+  text-align: left;
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+}
+
+.spec-list li, .feature-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid #2a2a2a;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.spec-list li:last-child, .feature-list li:last-child {
+  border-bottom: none;
+}
+
+.spec-list i, .feature-list i {
+  margin-right: 10px;
+  width: 20px;
+  text-align: center;
+  color: var(--primary);
+}
+
+.spec-list li:last-child i {
+  color: var(--accent3);
+}
+
+.btn {
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  border: none;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(90deg, var(--secondary), var(--primary));
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(124, 92, 255, 0.4);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+}
+
+.btn-outline:hover {
+  background: var(--primary);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(124, 92, 255, 0.4);
+}
+
+.guarantee {
+  margin-top: 15px;
+  font-size: 12px;
+  color: #aaa;
+}
+
+.guarantee i {
+  margin-right: 5px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1199.98px) {
+  .pricing-card {
+    padding: 25px;
+  }
+  
+  .price {
+    font-size: 36px;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .section-title {
+    font-size: 2rem;
+  }
+  
+  .specs-container {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .section {
+    padding: 3rem 0;
+  }
+  
+  .pricing-card {
+    margin-bottom: 40px;
+  }
+  
+  .price {
+    font-size: 32px;
+  }
+}
+
+</style>
+                <!-- WhatsApp Floating Button -->
+<a href="https://wa.me/917972499728?text=Hello%2C%20I%20want%20to%20know%20more%20about%20your%20services." 
+   class="whatsapp_float" 
+   target="_blank" 
+   rel="noopener noreferrer">
+   <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" 
+        alt="WhatsApp Chat" 
+        width="50" 
+        height="50">
+</a>
+
+<style>
+.whatsapp_float {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    bottom: 20px;
+    right: 20px;
+    background-color: #25d366;
+    border-radius: 50%;
+    text-align: center;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+.whatsapp_float:hover {
+    transform: scale(1.1);
+}
+.whatsapp_float img {
+    width: 35px;
+    height: 35px;
+}
+</style>
+
+
+    </form>
+<script src="<%= ResolveUrl("~/assets/vendor/jquery/jquery.min.js") %>"></script>
+<script src="<%= ResolveUrl("~/assets/vendor/bootstrap/5.1.3/bootstrap.min.js") %>"></script>
+<script src="<%= ResolveUrl("~/assets/vendor/offcanvas-nav/hc-offcanvas-nav.js") %>"></script>
+<script src="<%= ResolveUrl("~/assets/vendor/greensock/gsap.min.js") %>"></script>
+<script src="<%= ResolveUrl("~/assets/vendor/greensock/ScrollTrigger.min.js") %>"></script>
+<script src="<%= ResolveUrl("~/assets/vendor/greensock/ScrollSmoother.min.js") %>"></script>
+<script src="<%= ResolveUrl("~/assets/vendor/greensock/ScrollToPlugin.min.js") %>"></script>
+<script src="<%= ResolveUrl("~/assets/vendor/slick/1.8.1/slick.min.js") %>"></script>
+<script src="<%= ResolveUrl("~/assets/vendor/parallax/3.1.0/parallax.min.js") %>"></script>
+
+<!-- Main Theme JS -->
+<script src="<%= ResolveUrl("~/assets/js/youtube-video.js") %>"></script>
+<script src="<%= ResolveUrl("~/assets/js/theme.js") %>"></script>
+
+<!-- Preview Only -->
+<script src="<%= ResolveUrl("~/assets/vendor/spectrum/spectrum.min.js") %>"></script>
+<script src="<%= ResolveUrl("~/assets/vendor/clipboard/clipboard.min.js") %>"></script>
+<script src="<%= ResolveUrl("~/assets/js/theme-preview-only.js") %>"></script>
+<link href="<%= ResolveUrl("~/assets/vendor/spectrum/spectrum.min.css") %>" rel="stylesheet" />
+
+
+
+
+</body>
+</html>

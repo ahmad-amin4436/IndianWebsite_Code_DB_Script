@@ -25,9 +25,18 @@ public partial class Portal_ManageOrders : System.Web.UI.Page
     {
         int userId = Convert.ToInt32(Session["UserID"]);
         string search = txtSearch.Text.Trim();
+        DataTable dtOrders = new DataTable();
+        if (userId == 19)
+        {
+             dtOrders = orderDal.GetOrdersForAdmin(userId, search);
 
+        }
+        else
+        {
+             dtOrders = orderDal.GetOrders(userId, search);
+
+        }
         // Step 1: Fetch orders from DB
-        DataTable dtOrders = orderDal.GetOrders(userId, search);
 
         // Step 2: Prepare DataTable for merged API results
         DataTable dtApiResults = new DataTable();
@@ -40,6 +49,8 @@ public partial class Portal_ManageOrders : System.Web.UI.Page
         dtApiResults.Columns.Add("PowerStatus");
         dtApiResults.Columns.Add("RAM");
         dtApiResults.Columns.Add("ExpiryDate");
+        dtApiResults.Columns.Add("CustomerName");
+
 
         using (HttpClient client = new HttpClient())
         {
@@ -48,7 +59,11 @@ public partial class Portal_ManageOrders : System.Web.UI.Page
             foreach (DataRow row in dtOrders.Rows)
             {
                 var payload = new { ip = row["IP"].ToString() };
-
+                string CustomerName = Session["CustomerName"].ToString();
+                if (userId == 19)
+                {
+                    CustomerName = row["CustomerName"].ToString();
+                }
                 StringContent content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
                 HttpResponseMessage response = await client.PostAsync("https://smartvps.online/api/oceansmart/status", content);
 
@@ -119,7 +134,8 @@ public partial class Portal_ManageOrders : System.Web.UI.Page
                                         apiResponse.data.lastActionMethod ?? "",
                                                                                 apiResponse.data.status ?? "",
                                         $"{apiResponse.data.memorySize} MB",
-                                        "" // expiry date placeholder
+                                        "", // expiry date placeholder
+                                        CustomerName
                                     );
                                 }
                                 
@@ -149,7 +165,8 @@ public partial class Portal_ManageOrders : System.Web.UI.Page
                         apiData.MachineStatus,
                         apiData.PowerStatus,
                         apiData.RAM,
-                        apiData.ExpiryDate
+                        apiData.ExpiryDate,
+                        CustomerName
                     );
                 }
                 
@@ -161,7 +178,10 @@ public partial class Portal_ManageOrders : System.Web.UI.Page
         pnlNoOrders.Visible = dtApiResults.Rows.Count == 0;
     }
 
-    protected void txtSearch_TextChanged(object sender, EventArgs e) => LoadOrders();
+    protected void txtSearch_TextChanged(object sender, EventArgs e)
+    {
+        LoadOrders();
+    }
     protected void btnClear_Click(object sender, EventArgs e)
     {
         txtSearch.Text = "";

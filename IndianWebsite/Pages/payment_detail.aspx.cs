@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.UI;
@@ -150,7 +152,7 @@ public partial class Pages_payment_detail : Page
                     ram,
                     DateTime.Now.AddMonths(1)
                 );
-
+                
                 // ✅ Display details on page
                 lblVpsDetails.Text = $@"
                 <b>Order ID:</b> {orderId}<br/>
@@ -161,6 +163,18 @@ public partial class Pages_payment_detail : Page
                 <b>Status:</b> {status}<br/>
                 <b>Message:</b> {message}<br/>
                 <b>Note:</b> VPS details have been sent to your registered email.";
+                SendVpsDetailsEmail(
+                   lblCustomer.Text,         // customer name
+                   lblEmail.Text,            // customer email
+                   "Cosmos Recog Server",              // provider name
+                   ip,                       // VPS IP
+                   serverOS,                 // OS
+                   lblCustomer.Text,         // username
+                   "Check your Manage Order at portal",       // password (if available)
+                   ram,                      // RAM
+                   status,                   // VPS status
+                   DateTime.Now.AddMonths(1).ToString("f") // expiry
+               );
             }
         }
         catch (HttpRequestException httpEx)
@@ -229,6 +243,26 @@ public partial class Pages_payment_detail : Page
                     status.RAM?.Trim() ?? ram,
                     status.ExpiryDate
                 );
+                lblVpsDetails.Text = $@"
+                <b>Transaction ID:</b> {lblClientTxnId}<br/>
+                <b>IP:</b> {ip}<br/>
+                <b>OS:</b> {status.OS}<br/>
+                <b>Username:</b> {lblCustomer.Text}<br/>
+                <b>RAM:</b> {ram}<br/>
+                <b>Status:</b> {status}<br/>
+                <b>Note:</b> VPS details have been sent to your registered email.";
+                SendVpsDetailsEmail(
+                   lblCustomer.Text,         // customer name
+                   lblEmail.Text,            // customer email
+                   "Cosmos Recog Server",              // provider name
+                   ip,                       // VPS IP
+                   status.OS?.Trim(),                 // OS
+                   lblCustomer.Text,         // username
+                   "Check your Manage Order at portal",       // password (if available)
+                   status.RAM,                      // RAM
+                   status.PowerStatus?.Trim() ?? "Running",                   // VPS status
+                   DateTime.Now.AddMonths(1).ToString("f") // expiry
+               );
             }
             else
             {
@@ -242,6 +276,84 @@ public partial class Pages_payment_detail : Page
         lblVpsStatus.Text = $"❌ Error ordering OceanSmart VPS: {ex.Message}";
     }
 }
+    private void SendVpsDetailsEmail(
+    string customerName,
+    string customerEmail,
+    string providerName,
+    string ip,
+    string os,
+    string username,
+    string password,
+    string ram,
+    string status,
+    string expiryDate)
+    {
+        string dateTime = DateTime.Now.ToString("f");
+
+        string htmlBody = $@"
+    <html>
+    <body style='font-family:Arial;background:#f4f4f4;padding:20px;'>
+      <div style='background:#fff;padding:20px;border-radius:10px;max-width:650px;margin:auto;'>
+        <h2 style='color:#333;'>🖥️ VPS Order Confirmation - <span style='color:#007bff;'>{providerName}</span></h2>
+        <p>Hi <strong>{customerName}</strong>,</p>
+        <p>Your VPS has been successfully set up! Here are your details:</p>
+
+        <table style='width:100%;border-collapse:collapse;margin-top:10px;'>
+          <tr><td style='padding:8px;border:1px solid #ddd;'><strong>Provider</strong></td><td style='padding:8px;border:1px solid #ddd;'>{providerName}</td></tr>
+          <tr><td style='padding:8px;border:1px solid #ddd;'><strong>IP Address</strong></td><td style='padding:8px;border:1px solid #ddd;'>{ip}</td></tr>
+          <tr><td style='padding:8px;border:1px solid #ddd;'><strong>OS</strong></td><td style='padding:8px;border:1px solid #ddd;'>{os}</td></tr>
+          <tr><td style='padding:8px;border:1px solid #ddd;'><strong>Username</strong></td><td style='padding:8px;border:1px solid #ddd;'>{username}</td></tr>
+          <tr><td style='padding:8px;border:1px solid #ddd;'><strong>Password</strong></td><td style='padding:8px;border:1px solid #ddd;'>{password}</td></tr>
+          <tr><td style='padding:8px;border:1px solid #ddd;'><strong>RAM</strong></td><td style='padding:8px;border:1px solid #ddd;'>{ram} GB</td></tr>
+          <tr><td style='padding:8px;border:1px solid #ddd;'><strong>Status</strong></td><td style='padding:8px;border:1px solid #ddd;'>{status}</td></tr>
+          <tr><td style='padding:8px;border:1px solid #ddd;'><strong>Expiry Date</strong></td><td style='padding:8px;border:1px solid #ddd;'>{expiryDate}</td></tr>
+          <tr><td style='padding:8px;border:1px solid #ddd;'><strong>Generated On</strong></td><td style='padding:8px;border:1px solid #ddd;'>{dateTime}</td></tr>
+        </table>
+
+        <p style='margin-top:15px;'>Please keep this information safe. You can log in to your VPS using the above credentials.</p>
+
+        <div style='font-size:12px;color:#999;margin-top:20px;'>
+          This is an automated email from COSMOSRECOG Hosting Solutions.<br/>
+          &copy; 2025 COSMOSRECOG
+        </div>
+      </div>
+    </body>
+    </html>";
+
+        try
+        {
+            string fromEmail = "radhabalav2005@gmail.com";
+            string appPassword = "btxc hvpi snjj knef";
+            string sellerEmail = "radhabalav2005@gmail.com"; // seller/your team
+
+            using (SmtpClient client = new SmtpClient("smtp.gmail.com", 587))
+            {
+                client.EnableSsl = true;
+                client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                client.UseDefaultCredentials = false;
+                client.Credentials = new NetworkCredential(fromEmail, appPassword);
+
+                MailMessage message = new MailMessage
+                {
+                    From = new MailAddress(fromEmail, "COSMOSRECOG VPS Team"),
+                    Subject = $"✅ VPS Order Confirmation - {providerName}",
+                    Body = htmlBody,
+                    IsBodyHtml = true
+                };
+
+                message.To.Add(new MailAddress(customerEmail));
+                message.To.Add(new MailAddress(sellerEmail));
+
+                client.Send(message);
+            }
+        }
+        catch (Exception ex)
+        {
+           
+        }
+    }
+
+
     string Clean(string input)
     {
         if (string.IsNullOrWhiteSpace(input)) return string.Empty;

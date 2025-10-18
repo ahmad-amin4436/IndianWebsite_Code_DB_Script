@@ -172,6 +172,24 @@ public class DAL
 
         return dt;
     }
+    public DataTable GetOrdersForAdmin(int userId, string search)
+    {
+        DataTable dt = new DataTable();
+
+        using (SqlConnection con = new SqlConnection(cs))
+        {
+            using (SqlCommand cmd = new SqlCommand("SP_GetOrdersForAdmin", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Keyword", string.IsNullOrEmpty(search) ? "" : search);
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(dt);
+            }
+        }
+
+        return dt;
+    }
     public DataSet GetUserDashboardData(int userId)
     {
         using (SqlConnection con = new SqlConnection(cs))

@@ -8,7 +8,7 @@ using System.Web;
 using static PaymentGatewayHelper;
 
 /// <summary>
-/// Summary description for DAL
+/// Summary description for DAL //
 /// </summary>
 public class DAL
 {

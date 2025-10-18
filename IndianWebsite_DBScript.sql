@@ -1,12 +1,12 @@
 USE [master]
 GO
-/****** Object:  Database [db_abe38f_scbhai0070]    Script Date: 18/10/2025 3:01:24 am ******/
+/****** Object:  Database [db_abe38f_scbhai0070]    Script Date: 19/10/2025 2:20:11 am ******/
 CREATE DATABASE [db_abe38f_scbhai0070]
  CONTAINMENT = NONE
  ON  PRIMARY 
-( NAME = N'db_abe38f_scbhai0070_Data', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\db_abe38f_scbhai0070_DATA.mdf' , SIZE = 8192KB , MAXSIZE = 1024000KB , FILEGROWTH = 10%)
+( NAME = N'db_abe38f_scbhai0070_Data', FILENAME = N'H:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\db_abe38f_scbhai0070_DATA.mdf' , SIZE = 8192KB , MAXSIZE = 1024000KB , FILEGROWTH = 10%)
  LOG ON 
-( NAME = N'db_abe38f_scbhai0070_Log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\db_abe38f_scbhai0070_Log.LDF' , SIZE = 3072KB , MAXSIZE = 2048GB , FILEGROWTH = 10%)
+( NAME = N'db_abe38f_scbhai0070_Log', FILENAME = N'H:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\db_abe38f_scbhai0070_Log.LDF' , SIZE = 3072KB , MAXSIZE = 2048GB , FILEGROWTH = 10%)
  WITH CATALOG_COLLATION = DATABASE_DEFAULT, LEDGER = OFF
 GO
 ALTER DATABASE [db_abe38f_scbhai0070] SET COMPATIBILITY_LEVEL = 160
@@ -82,7 +82,7 @@ ALTER DATABASE [db_abe38f_scbhai0070] SET QUERY_STORE (OPERATION_MODE = READ_WRI
 GO
 USE [db_abe38f_scbhai0070]
 GO
-/****** Object:  Table [dbo].[PaymentOrders]    Script Date: 18/10/2025 3:01:30 am ******/
+/****** Object:  Table [dbo].[PaymentOrders]    Script Date: 19/10/2025 2:20:15 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -105,7 +105,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[UserRegistration]    Script Date: 18/10/2025 3:01:30 am ******/
+/****** Object:  Table [dbo].[UserRegistration]    Script Date: 19/10/2025 2:20:16 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -123,7 +123,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[VpsOrders]    Script Date: 18/10/2025 3:01:30 am ******/
+/****** Object:  Table [dbo].[VpsOrders]    Script Date: 19/10/2025 2:20:16 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -182,6 +182,18 @@ INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [Custome
 GO
 INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (82, N'TXN20251017122429', 138617155, CAST(650.00 AS Decimal(18, 2)), N'travelchoudhary933', N'travelchoudhary933@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/54716b9eec5b83ddb46b290f7128cd8d', CAST(N'2025-10-17T12:24:30.430' AS DateTime), 0, NULL)
 GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (83, N'TXN20251017181312', 138623247, CAST(650.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/4f6d8bd7c67badf8f7d5ed9fd13a550d', CAST(N'2025-10-17T18:13:13.480' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (84, N'TXN20251017181729', 138623332, CAST(900.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/914cc32de21f39a45d61f7d84475876d', CAST(N'2025-10-17T18:17:30.997' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (85, N'TXN20251017182105', 138623404, CAST(900.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/2b0a5766313a1e06a3b53f3af766c5a3', CAST(N'2025-10-17T18:21:07.280' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (86, N'TXN20251017182526', 138623523, CAST(900.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/908a9f034acc9ad8fcef33ba07a248ea', CAST(N'2025-10-17T18:25:27.467' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (87, N'TXN20251017182528', 138623524, CAST(900.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/1127446ca1b7ab703cbb5fdbcbeba4b1', CAST(N'2025-10-17T18:25:29.500' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (88, N'TXN20251018064543', 138700722, CAST(900.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/2e69b3dbecd49b7cfdf391ba5076a79f', CAST(N'2025-10-18T06:45:44.687' AS DateTime), 0, NULL)
+GO
 SET IDENTITY_INSERT [dbo].[PaymentOrders] OFF
 GO
 SET IDENTITY_INSERT [dbo].[UserRegistration] ON 
@@ -218,6 +230,8 @@ INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [Con
 GO
 INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (18, N'Anshu', N'travelchoudhary933@gmail.com', N'Anshu00', N'Anshu00', CAST(N'2025-10-17T12:20:49.610' AS DateTime))
 GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (19, N'Shree Hari', N'radhabalav2005@gmail.com', N'SCBH@!123', N'SCBH@!123', CAST(N'2025-10-18T13:19:52.103' AS DateTime))
+GO
 SET IDENTITY_INSERT [dbo].[UserRegistration] OFF
 GO
 SET IDENTITY_INSERT [dbo].[VpsOrders] ON 
@@ -242,7 +256,7 @@ ALTER TABLE [dbo].[UserRegistration] ADD  CONSTRAINT [DF_UserRegistration_Create
 GO
 ALTER TABLE [dbo].[VpsOrders] ADD  DEFAULT (getdate()) FOR [CreatedAt]
 GO
-/****** Object:  StoredProcedure [dbo].[sp_ChangePassword]    Script Date: 18/10/2025 3:01:36 am ******/
+/****** Object:  StoredProcedure [dbo].[sp_ChangePassword]    Script Date: 19/10/2025 2:20:21 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -269,7 +283,7 @@ BEGIN
     END
 END
 GO
-/****** Object:  StoredProcedure [dbo].[SP_GetOrders]    Script Date: 18/10/2025 3:01:36 am ******/
+/****** Object:  StoredProcedure [dbo].[SP_GetOrders]    Script Date: 19/10/2025 2:20:21 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -308,7 +322,47 @@ BEGIN
     ORDER BY ExpiryDate DESC;
 END;
 GO
-/****** Object:  StoredProcedure [dbo].[SP_GetPaymentOrder]    Script Date: 18/10/2025 3:01:36 am ******/
+/****** Object:  StoredProcedure [dbo].[SP_GetOrdersForAdmin]    Script Date: 19/10/2025 2:20:21 am ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[SP_GetOrdersForAdmin]
+    @Keyword NVARCHAR(100) = NULL      -- Optional search term
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        o.Id,
+        o.ClientTransactionID,
+        o.IP,
+        o.OS,
+        o.Username,
+        o.Password,
+        o.ActionStatus,
+        o.MachineStatus,
+        o.PowerStatus,
+        o.RAM,
+        o.ExpiryDate,
+        o.CreatedAt,
+        o.UserID,
+        u.FullName AS CustomerName
+    FROM VpsOrders o
+    LEFT JOIN UserRegistration u ON o.UserID = u.UserID
+    WHERE 
+       
+            @Keyword IS NULL OR @Keyword = '' OR
+            o.IP LIKE '%' + @Keyword + '%' OR
+            o.OS LIKE '%' + @Keyword + '%' OR
+            o.Username LIKE '%' + @Keyword + '%' OR
+            u.FullName  LIKE '%' + @Keyword + '%' OR
+            o.ClientTransactionID LIKE '%' + @Keyword + '%'
+        
+    ORDER BY o.ExpiryDate DESC;
+END;
+GO
+/****** Object:  StoredProcedure [dbo].[SP_GetPaymentOrder]    Script Date: 19/10/2025 2:20:21 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -323,7 +377,7 @@ BEGIN
     WHERE ClientTxnId = @ClientTxnId;
 END
 GO
-/****** Object:  StoredProcedure [dbo].[sp_GetUserDashboardData]    Script Date: 18/10/2025 3:01:36 am ******/
+/****** Object:  StoredProcedure [dbo].[sp_GetUserDashboardData]    Script Date: 19/10/2025 2:20:21 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -363,7 +417,7 @@ BEGIN
 	
 END
 GO
-/****** Object:  StoredProcedure [dbo].[sp_GetUserProfile]    Script Date: 18/10/2025 3:01:36 am ******/
+/****** Object:  StoredProcedure [dbo].[sp_GetUserProfile]    Script Date: 19/10/2025 2:20:21 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -377,7 +431,7 @@ BEGIN
     WHERE UserID = @UserID;
 END
 GO
-/****** Object:  StoredProcedure [dbo].[SP_InsertVpsOrder]    Script Date: 18/10/2025 3:01:36 am ******/
+/****** Object:  StoredProcedure [dbo].[SP_InsertVpsOrder]    Script Date: 19/10/2025 2:20:21 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -402,7 +456,7 @@ BEGIN
     (@ClientTransactionID, @UserID, @IP, @OS, @Username, @Password, @ActionStatus, @MachineStatus, @PowerStatus, @RAM, @ExpiryDate, GETDATE());
 END
 GO
-/****** Object:  StoredProcedure [dbo].[SP_UpdatePaymentStatus]    Script Date: 18/10/2025 3:01:36 am ******/
+/****** Object:  StoredProcedure [dbo].[SP_UpdatePaymentStatus]    Script Date: 19/10/2025 2:20:21 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -418,7 +472,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [dbo].[SP_UserRegistration]    Script Date: 18/10/2025 3:01:36 am ******/
+/****** Object:  StoredProcedure [dbo].[SP_UserRegistration]    Script Date: 19/10/2025 2:20:21 am ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

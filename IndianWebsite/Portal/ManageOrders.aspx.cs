@@ -50,6 +50,7 @@ public partial class Portal_ManageOrders : System.Web.UI.Page
         dtApiResults.Columns.Add("RAM");
         dtApiResults.Columns.Add("ExpiryDate");
         dtApiResults.Columns.Add("CustomerName");
+        dtApiResults.Columns.Add("Email");
 
 
         using (HttpClient client = new HttpClient())
@@ -60,9 +61,11 @@ public partial class Portal_ManageOrders : System.Web.UI.Page
             {
                 var payload = new { ip = row["IP"].ToString() };
                 string CustomerName = Session["CustomerName"].ToString();
+                string Email = "";
                 if (userId == 19)
                 {
                     CustomerName = row["CustomerName"].ToString();
+                    Email = row["Email"].ToString();
                 }
                 StringContent content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
                 HttpResponseMessage response = await client.PostAsync("https://smartvps.online/api/oceansmart/status", content);
@@ -125,17 +128,21 @@ public partial class Portal_ManageOrders : System.Web.UI.Page
                                     Session["HD_ON_or_OFF"] = apiResponse.data.lastActionMethod ?? string.Empty;
 
                                     // ✅ Add data to DataTable
+                                    string osName = apiResponse.data.os ?? "";
+                                    string userName = osName.ToLower().Contains("windows") ? "Administrator" : "root";
+
                                     dtApiResults.Rows.Add(
                                         ipv4,
-                                        apiResponse.data.os ?? "",
-                                        apiResponse.data.hostname ?? "",
+                                        osName,
+                                        userName,
                                         apiResponse.data.password ?? "",
                                         apiResponse.data.lastActionStatus ?? "",
                                         apiResponse.data.lastActionMethod ?? "",
-                                                                                apiResponse.data.status ?? "",
+                                        apiResponse.data.status ?? "",
                                         $"{apiResponse.data.memorySize} MB",
                                         "", // expiry date placeholder
-                                        CustomerName
+                                        CustomerName,
+                                        Email
                                     );
                                 }
                                 
@@ -166,7 +173,8 @@ public partial class Portal_ManageOrders : System.Web.UI.Page
                         apiData.PowerStatus,
                         apiData.RAM,
                         apiData.ExpiryDate,
-                        CustomerName
+                        CustomerName,
+                        Email
                     );
                 }
                 

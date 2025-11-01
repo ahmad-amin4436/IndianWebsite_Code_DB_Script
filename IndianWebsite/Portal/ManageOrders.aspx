@@ -93,6 +93,7 @@
 
                                     <p class="mb-2"><strong>Expires:</strong> <%# Eval("ExpiryDate") %></p>
                                     <p class="mb-2"><strong>Customer Name:</strong> <%# Eval("CustomerName") %></p>
+                                    <p class="mb-2"><strong>Email:</strong> <%# Eval("Email") %></p>
 
                                     <span class="badge 
                                         <%# Eval("ActionStatus").ToString() == "Active" ? "bg-success" : 

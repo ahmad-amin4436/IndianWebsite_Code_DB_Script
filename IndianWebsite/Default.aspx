@@ -2,18 +2,7 @@
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
     <!-- Hero Social Icons Menu -->
-				<section class="hero-socials-section">
-					<div class="hero-socials-inner">
-						<div class="hero-socials">
-							<a class="social-icons" href="#" target="_blank"><span><span class="icon-youtube1"></span></span></a>
-							<a class="social-icons" href="#" target="_blank"><span><span class="icon-twitter1"></span></span></a>
-							<a class="social-icons" href="#" target="_blank"><span><span class="icon-behance1"></span></span></a>
-							<a class="social-icons" href="#" target="_blank"><span><span class="icon-dribbble1"></span></span></a>
-							<a class="social-icons" href="#" target="_blank"><span><span class="icon-instagram1"></span></span></a>
-							<a class="social-icons" href="#" target="_blank"><span><span class="icon-pinterest"></span></span></a>
-						</div>
-					</div>
-				</section>
+			
 				<!-- Hero Section / Hero Slider
 				================================================== -->
 				<section class="sk__hero-section">

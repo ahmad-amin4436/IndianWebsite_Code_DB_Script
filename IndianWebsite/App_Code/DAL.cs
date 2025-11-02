@@ -245,4 +245,49 @@ public class DAL
             return result == 1; // 1 = success, 0 = wrong current password
         }
     }
+    public void SaveMessage(string roomEmail, string sender, string message)
+    {
+        using (SqlConnection con = new SqlConnection(cs))
+        using (SqlCommand cmd = new SqlCommand("sp_SaveChatMessage", con))
+        {
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@RoomEmail", roomEmail);
+            cmd.Parameters.AddWithValue("@Sender", sender);
+            cmd.Parameters.AddWithValue("@Message", message);
+
+            con.Open();
+            cmd.ExecuteNonQuery();
+        }
+    }
+
+    public List<ChatMessage> GetMessages(string roomEmail)
+    {
+        var messages = new List<ChatMessage>();
+
+        using (SqlConnection con = new SqlConnection(cs))
+        using (SqlCommand cmd = new SqlCommand("sp_GetChatHistory", con))
+        {
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@RoomEmail", roomEmail);
+
+            con.Open();
+
+            using (SqlDataReader rdr = cmd.ExecuteReader())
+            {
+                while (rdr.Read())
+                {
+                    messages.Add(new ChatMessage
+                    {
+                        Sender = rdr["Sender"].ToString(),
+                        Message = rdr["Message"].ToString(),
+                        SentAt = rdr["SentAt"] != DBNull.Value
+                            ? Convert.ToDateTime(rdr["SentAt"])
+                            : DateTime.MinValue
+                    });
+                }
+            }
+        }
+
+        return messages;
+    }
 }

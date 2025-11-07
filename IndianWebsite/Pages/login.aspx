@@ -46,9 +46,14 @@
             <asp:Button ID="btnLogin" runat="server" CssClass="btn btn-primary btn-block" 
               Text="Login to Account" OnClick="btnLogin_Click" />
             <asp:Label ID="lblMessage" runat="server" CssClass="text-danger mt-2"></asp:Label>
-
-            <div class="text-center mt-3">
+               <div class="text-center mt-3">
               <asp:HyperLink ID="lnkForgotPassword" runat="server" 
+                CssClass="text-muted" NavigateUrl="~/Pages/forgotpassword.aspx">
+               Forgot Password?
+              </asp:HyperLink>
+            </div>
+            <div class="text-center mt-3">
+              <asp:HyperLink ID="lnkRegister" runat="server" 
                 CssClass="text-muted" NavigateUrl="~/Pages/Register.aspx">
                 Don't have an account? Register!
               </asp:HyperLink>

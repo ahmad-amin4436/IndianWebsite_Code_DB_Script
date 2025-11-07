@@ -230,6 +230,19 @@ public class DAL
             cmd.ExecuteNonQuery();
         }
     }
+    public DataTable GetUserByEmail(string Email)
+    {
+        using (SqlConnection con = new SqlConnection(cs))
+        {
+            SqlCommand cmd = new SqlCommand("SELECT * FROM UserRegistration WHERE Email = @Email", con);
+            cmd.Parameters.AddWithValue("@Email", Email);
+            con.Open();
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            da.Fill(dt);
+            return dt;
+        }
+    }
     public bool ChangePassword(int userId, string currentPassword, string newPassword)
     {
         using (SqlConnection con = new SqlConnection(cs))

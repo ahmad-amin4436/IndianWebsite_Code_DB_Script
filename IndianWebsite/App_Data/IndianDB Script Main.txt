@@ -1,0 +1,713 @@
+USE [master]
+GO
+/****** Object:  Database [db_abe38f_scbhai0070]    Script Date: 08/11/2025 1:23:48 pm ******/
+CREATE DATABASE [db_abe38f_scbhai0070]
+ CONTAINMENT = NONE
+ ON  PRIMARY 
+( NAME = N'db_abe38f_scbhai0070_Data', FILENAME = N'H:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\db_abe38f_scbhai0070_DATA.mdf' , SIZE = 8192KB , MAXSIZE = 1024000KB , FILEGROWTH = 10%)
+ LOG ON 
+( NAME = N'db_abe38f_scbhai0070_Log', FILENAME = N'H:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\db_abe38f_scbhai0070_Log.LDF' , SIZE = 3072KB , MAXSIZE = 2048GB , FILEGROWTH = 10%)
+ WITH CATALOG_COLLATION = DATABASE_DEFAULT, LEDGER = OFF
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET COMPATIBILITY_LEVEL = 160
+GO
+IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
+begin
+EXEC [db_abe38f_scbhai0070].[dbo].[sp_fulltext_database] @action = 'enable'
+end
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET ANSI_NULL_DEFAULT OFF 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET ANSI_NULLS OFF 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET ANSI_PADDING OFF 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET ANSI_WARNINGS OFF 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET ARITHABORT OFF 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET AUTO_CLOSE OFF 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET AUTO_SHRINK OFF 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET AUTO_UPDATE_STATISTICS ON 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET CURSOR_CLOSE_ON_COMMIT OFF 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET CURSOR_DEFAULT  GLOBAL 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET CONCAT_NULL_YIELDS_NULL OFF 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET NUMERIC_ROUNDABORT OFF 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET QUOTED_IDENTIFIER OFF 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET RECURSIVE_TRIGGERS OFF 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET  ENABLE_BROKER 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET DATE_CORRELATION_OPTIMIZATION OFF 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET TRUSTWORTHY OFF 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET ALLOW_SNAPSHOT_ISOLATION OFF 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET PARAMETERIZATION SIMPLE 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET READ_COMMITTED_SNAPSHOT OFF 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET HONOR_BROKER_PRIORITY OFF 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET RECOVERY SIMPLE 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET  MULTI_USER 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET PAGE_VERIFY CHECKSUM  
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET DB_CHAINING OFF 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET TARGET_RECOVERY_TIME = 60 SECONDS 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET DELAYED_DURABILITY = DISABLED 
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET ACCELERATED_DATABASE_RECOVERY = OFF  
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET QUERY_STORE = ON
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET QUERY_STORE (OPERATION_MODE = READ_WRITE, CLEANUP_POLICY = (STALE_QUERY_THRESHOLD_DAYS = 30), DATA_FLUSH_INTERVAL_SECONDS = 900, INTERVAL_LENGTH_MINUTES = 60, MAX_STORAGE_SIZE_MB = 1000, QUERY_CAPTURE_MODE = AUTO, SIZE_BASED_CLEANUP_MODE = AUTO, MAX_PLANS_PER_QUERY = 200, WAIT_STATS_CAPTURE_MODE = ON)
+GO
+USE [db_abe38f_scbhai0070]
+GO
+/****** Object:  Table [dbo].[ChatMessages]    Script Date: 08/11/2025 1:23:53 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ChatMessages](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[RoomEmail] [nvarchar](200) NULL,
+	[Sender] [nvarchar](100) NULL,
+	[Message] [nvarchar](max) NULL,
+	[SentAt] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[PaymentOrders]    Script Date: 08/11/2025 1:23:54 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[PaymentOrders](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[ClientTxnId] [varchar](50) NULL,
+	[OrderId] [int] NULL,
+	[Amount] [decimal](18, 2) NULL,
+	[CustomerName] [varchar](100) NULL,
+	[CustomerEmail] [varchar](100) NULL,
+	[CustomerMobile] [varchar](20) NULL,
+	[PaymentUrl] [varchar](max) NULL,
+	[CreatedAt] [datetime] NULL,
+	[PaymentStatus] [bit] NULL,
+	[UserID] [bigint] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[UserRegistration]    Script Date: 08/11/2025 1:23:54 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[UserRegistration](
+	[UserID] [int] IDENTITY(1,1) NOT NULL,
+	[FullName] [varchar](max) NULL,
+	[Email] [varchar](max) NULL,
+	[Password] [varchar](max) NULL,
+	[ConfirmPassword] [varchar](max) NULL,
+	[CreatedDate] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[UserID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[VpsOrders]    Script Date: 08/11/2025 1:23:54 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[VpsOrders](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[ClientTransactionID] [varchar](100) NOT NULL,
+	[IP] [nvarchar](50) NULL,
+	[OS] [nvarchar](100) NULL,
+	[Username] [nvarchar](100) NULL,
+	[Password] [nvarchar](100) NULL,
+	[ActionStatus] [nvarchar](50) NULL,
+	[MachineStatus] [nvarchar](50) NULL,
+	[PowerStatus] [nvarchar](50) NULL,
+	[RAM] [nvarchar](50) NULL,
+	[ExpiryDate] [datetime] NULL,
+	[CreatedAt] [datetime] NULL,
+	[UserID] [bigint] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET IDENTITY_INSERT [dbo].[ChatMessages] ON 
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (1, N'hafizmuhammadahmadamin@gmail.com', N'hafizmuhammadahmadamin@gmail.com', N'ddvsv', CAST(N'2025-11-02T01:11:18.053' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (2, N'hafizmuhammadahmadamin@gmail.com', N'Agent', N'cscsd', CAST(N'2025-11-02T01:11:22.050' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (3, N'hafizmuhammadahmadamin@gmail.com', N'Agent', N'dcsc', CAST(N'2025-11-02T01:11:23.700' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (4, N'hafizmuhammadahmadamin@gmail.com', N'hafizmuhammadahmadamin@gmail.com', N'dsdsf', CAST(N'2025-11-02T01:11:26.670' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (5, N'hafizmuhammadahmadamin@gmail.com', N'Agent', N'dsfds', CAST(N'2025-11-02T01:11:29.240' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (6, N'hafizmuhammadahmadamin@gmail.com', N'hafizmuhammadahmadamin@gmail.com', N'dfsf', CAST(N'2025-11-02T01:11:31.553' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (7, N'hafizmuhammadahmadamin@gmail.com', N'Agent', N'dsfds', CAST(N'2025-11-02T01:11:34.167' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (8, N'hafizmuhammadahmadamin@gmail.com', N'hafizmuhammadahmadamin@gmail.com', N'hi', CAST(N'2025-11-02T01:21:08.633' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (9, N'hafizmuhammadahmadamin@gmail.com', N'Agent', N'hi', CAST(N'2025-11-02T01:21:09.517' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (10, N'hafizmuhammadahmadamin@gmail.com', N'Agent', N'ok scenes/?', CAST(N'2025-11-02T01:21:21.847' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (11, N'hafizmuhammadahmadamin@gmail.com', N'Agent', N'hn', CAST(N'2025-11-02T01:21:25.487' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (12, N'hafizmuhammadahmadamin@gmail.com', N'Agent', N'bs thik h', CAST(N'2025-11-02T01:21:29.980' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (13, N'hafizmuhammadahmadamin@gmail.com', N'Agent', N'nzr aa raha', CAST(N'2025-11-02T01:21:33.927' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (14, N'hafizmuhammadahmadamin@gmail.com', N'Agent', N'well good', CAST(N'2025-11-02T01:21:37.773' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (15, N'hafizmuhammadahmadamin@gmail.com', N'Agent', N'doog', CAST(N'2025-11-02T01:21:39.490' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (16, N'hafizmuhammadahmadamin@gmail.com', N'Agent', N'good', CAST(N'2025-11-02T01:21:43.720' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (17, N'hafizmuhammadahmadamin@gmail.com', N'hafizmuhammadahmadamin@gmail.com', N'yes', CAST(N'2025-11-02T01:21:48.940' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (18, N'dev.info.net.solution@gmail.com', N'Agent', N'fsdfs', CAST(N'2025-11-02T01:30:39.120' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (19, N'dev.info.net.solution@gmail.com', N'dev.info.net.solution@gmail.com', N'sdasdsada', CAST(N'2025-11-02T01:30:42.780' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (20, N'hafizmuhammadahmadamin@gmail.com', N'hafizmuhammadahmadamin@gmail.com', N'ffs', CAST(N'2025-11-02T01:34:23.740' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (21, N'hafizmuhammadahmadamin@gmail.com', N'Agent', N'dsdsfs', CAST(N'2025-11-02T01:34:28.143' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (22, N'hafizmuhammadahmadamin@gmail.com', N'Agent', N'fsdfsf', CAST(N'2025-11-02T01:34:29.897' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (23, N'aliqasim758@gmail.com', N'Agent', N'Hi', CAST(N'2025-11-02T01:37:52.727' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (24, N'aliqasim758@gmail.com', N'Agent', N'Kesy ho', CAST(N'2025-11-02T01:37:57.630' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (25, N'aliqasim758@gmail.com', N'aliqasim758@gmail.com', N'Thk', CAST(N'2025-11-02T01:38:02.853' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (26, N'aliqasim758@gmail.com', N'Agent', N'Sahi hogaya', CAST(N'2025-11-02T01:38:07.563' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (27, N'hafizmuhammadahmadamin@gmail.com', N'hafizmuhammadahmadamin@gmail.com', N'sdfs', CAST(N'2025-11-02T01:44:17.133' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (28, N'hafizmuhammadahmadamin@gmail.com', N'Agent', N'hi', CAST(N'2025-11-02T01:50:31.350' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (29, N'aliqasim758@gmail.com', N'aliqasim758@gmail.com', N'Hi', CAST(N'2025-11-02T01:20:33.670' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (30, N'aliqasim758@gmail.com', N'Agent', N'Ok sab', CAST(N'2025-11-02T01:20:51.670' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (31, N'aliqasim758@gmail.com', N'aliqasim758@gmail.com', N'Good hogiya', CAST(N'2025-11-02T01:21:06.650' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (32, N'm.ahmad.amin112344@gmail.com', N'm.ahmad.amin112344@gmail.com', N'HI dear', CAST(N'2025-11-02T10:15:01.953' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (33, N'm.ahmad.amin112344@gmail.com', N'Agent', N'yes its working live now', CAST(N'2025-11-02T10:15:11.853' AS DateTime))
+GO
+INSERT [dbo].[ChatMessages] ([Id], [RoomEmail], [Sender], [Message], [SentAt]) VALUES (34, N'karma931sc@gmail.com', N'karma931sc@gmail.com', N'sir vps not working', CAST(N'2025-11-03T18:33:36.547' AS DateTime))
+GO
+SET IDENTITY_INSERT [dbo].[ChatMessages] OFF
+GO
+SET IDENTITY_INSERT [dbo].[PaymentOrders] ON 
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (67, N'TXN20251016211217', 138475437, CAST(2450.00 AS Decimal(18, 2)), N'dev.info.net.solution', N'dev.info.net.solution@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/11982d007df8060f4f784d981a0dc7f1', CAST(N'2025-10-16T09:12:19.310' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (68, N'TXN20251016092804', 138476691, CAST(2450.00 AS Decimal(18, 2)), N'dev.info.net.solution', N'dev.info.net.solution@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/42ace369f47b29bd30b55ff13cff8350', CAST(N'2025-10-16T09:28:05.820' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (69, N'TXN20251016095754', 138479528, CAST(650.00 AS Decimal(18, 2)), N'karma935sc', N'karma935sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/fcbb833df7c1ee90e55896afd6a7ed2d', CAST(N'2025-10-16T09:57:55.853' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (70, N'TXN20251016095756', 138479531, CAST(650.00 AS Decimal(18, 2)), N'karma935sc', N'karma935sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/38a65258e46f6755a9e4f0c2f875512f', CAST(N'2025-10-16T09:57:57.867' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (71, N'TXN20251016111347', 138487073, CAST(900.00 AS Decimal(18, 2)), N'Kartik281328', N'Kartik281328@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/524c6173202f21f33663189f24653e38', CAST(N'2025-10-16T11:13:48.890' AS DateTime), 1, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (72, N'TXN20251016232656', 138487645, CAST(650.00 AS Decimal(18, 2)), N'dev.info.net.solution', N'dev.info.net.solution@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/6b8ec19525831b73abdcc06f081cc38e', CAST(N'2025-10-16T11:26:59.573' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (73, N'TXN20251017000944', 138489860, CAST(650.00 AS Decimal(18, 2)), N'dev.info.net.solution', N'dev.info.net.solution@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/c80d812dff5299c1d2748a91ba68e854', CAST(N'2025-10-16T12:09:47.463' AS DateTime), 1, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (74, N'TXN20251017001633', 138490194, CAST(650.00 AS Decimal(18, 2)), N'dev.info.net.solution', N'dev.info.net.solution@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/90d810fc452b1b23cc5ac938725d0013', CAST(N'2025-10-16T12:16:35.927' AS DateTime), 1, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (75, N'TXN20251017002723', 138490761, CAST(650.00 AS Decimal(18, 2)), N'dev.info.net.solution', N'dev.info.net.solution@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/7101046f058d8584b4de6890f4f10c94', CAST(N'2025-10-16T12:27:26.627' AS DateTime), 1, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (76, N'TXN20251017004548', 138491454, CAST(650.00 AS Decimal(18, 2)), N'dev.info.net.solution', N'dev.info.net.solution@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/ab59d5a15b25a93d7613be4f96efaaa3', CAST(N'2025-10-16T12:45:51.317' AS DateTime), 1, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (77, N'TXN20251017005035', 138491626, CAST(650.00 AS Decimal(18, 2)), N'dev.info.net.solution', N'dev.info.net.solution@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/c1401051e6520aa11196bb518ae3d1a1', CAST(N'2025-10-16T12:50:37.080' AS DateTime), 1, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (78, N'TXN20251017005915', 138491873, CAST(650.00 AS Decimal(18, 2)), N'dev.info.net.solution', N'dev.info.net.solution@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/263b07aa7f17c6990c30f9d6f8e58ac0', CAST(N'2025-10-16T12:59:18.053' AS DateTime), 1, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (79, N'TXN20251017010515', 138492038, CAST(650.00 AS Decimal(18, 2)), N'dev.info.net.solution', N'dev.info.net.solution@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/9c9d7dd13579a062ec1f02f0c5b1bad1', CAST(N'2025-10-16T13:05:16.973' AS DateTime), 1, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (80, N'TXN20251017011309', 138492214, CAST(650.00 AS Decimal(18, 2)), N'dev.info.net.solution', N'dev.info.net.solution@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/273ca002c90b8d6fc0f406cdd4656d81', CAST(N'2025-10-16T13:13:12.767' AS DateTime), 1, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (81, N'TXN20251016133059', 138492648, CAST(900.00 AS Decimal(18, 2)), N'dev.info.net.solution', N'dev.info.net.solution@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/221f4e8e037e490e03452b4459fd1575', CAST(N'2025-10-16T13:31:00.650' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (82, N'TXN20251017122429', 138617155, CAST(650.00 AS Decimal(18, 2)), N'travelchoudhary933', N'travelchoudhary933@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/54716b9eec5b83ddb46b290f7128cd8d', CAST(N'2025-10-17T12:24:30.430' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (83, N'TXN20251017181312', 138623247, CAST(650.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/4f6d8bd7c67badf8f7d5ed9fd13a550d', CAST(N'2025-10-17T18:13:13.480' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (84, N'TXN20251017181729', 138623332, CAST(900.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/914cc32de21f39a45d61f7d84475876d', CAST(N'2025-10-17T18:17:30.997' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (85, N'TXN20251017182105', 138623404, CAST(900.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/2b0a5766313a1e06a3b53f3af766c5a3', CAST(N'2025-10-17T18:21:07.280' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (86, N'TXN20251017182526', 138623523, CAST(900.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/908a9f034acc9ad8fcef33ba07a248ea', CAST(N'2025-10-17T18:25:27.467' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (87, N'TXN20251017182528', 138623524, CAST(900.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/1127446ca1b7ab703cbb5fdbcbeba4b1', CAST(N'2025-10-17T18:25:29.500' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (88, N'TXN20251018064543', 138700722, CAST(900.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/2e69b3dbecd49b7cfdf391ba5076a79f', CAST(N'2025-10-18T06:45:44.687' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (89, N'TXN20251019073637', 138823888, CAST(900.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/ad677bc25ca1126262f2892a11440b7f', CAST(N'2025-10-19T07:36:38.650' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (90, N'TXN20251019100633', 138840128, CAST(599.00 AS Decimal(18, 2)), N'Nikhlesh', N'Info.mithilacommunication@gmail.com', N'7970876833', N'https://qrstuff.me/gateway/pay/968fdc51a65548c476b007cdbda466fb', CAST(N'2025-10-19T10:06:34.143' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (91, N'TXN20251019205643', 138865339, CAST(1300.00 AS Decimal(18, 2)), N'mdrazansa', N'mdrazansa@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/cd15b3dfa9583df61939676a70fea0e1', CAST(N'2025-10-19T20:56:44.153' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (92, N'TXN20251019205650', 138865349, CAST(1300.00 AS Decimal(18, 2)), N'mdrazansa', N'mdrazansa@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/159e65d612e9206f748ba83053591f88', CAST(N'2025-10-19T20:56:51.100' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (93, N'TXN20251020230356', 138991309, CAST(1300.00 AS Decimal(18, 2)), N'scsindia822', N'scsindia822@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/490cc5597f141bf1e074caad5ce46936', CAST(N'2025-10-20T23:03:57.843' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (94, N'TXN20251023100012', 139299081, CAST(900.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/c92699d0e6899f61ef3e8ff28148a1a5', CAST(N'2025-10-23T10:00:13.790' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (95, N'TXN20251025204505', 139552521, CAST(900.00 AS Decimal(18, 2)), N'ranisk24f', N'ranisk24f@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/1ec8e69aea974330a1355e11c4ae6671', CAST(N'2025-10-25T20:45:06.890' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (96, N'TXN20251025204740', 139552737, CAST(900.00 AS Decimal(18, 2)), N'ranisk24f', N'ranisk24f@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/fba20bb9c8631f607466ad5b6789f466', CAST(N'2025-10-25T20:47:41.297' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (97, N'TXN20251026093419', 139641002, CAST(900.00 AS Decimal(18, 2)), N'msd36563', N'msd36563@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/09636ecd88b62f8bbb1756a970ee7697', CAST(N'2025-10-26T09:34:22.083' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (98, N'TXN20251029075109', 139997537, CAST(900.00 AS Decimal(18, 2)), N'dev.info.net.solution', N'dev.info.net.solution@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/e8182427fcf66bd939c94b907c1112ec', CAST(N'2025-10-29T07:51:10.423' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (99, N'TXN20251031065005', 140225358, CAST(2450.00 AS Decimal(18, 2)), N'mohanjaiswalmumbai', N'mohanjaiswalmumbai@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/1c0bdbaf7cdc31b8dd1dffae163dfab8', CAST(N'2025-10-31T06:50:06.410' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (100, N'TXN20251031202548', 140260907, CAST(900.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/3edc810fe4cf2d7ad1836ab5f374bc6f', CAST(N'2025-10-31T20:25:50.093' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (101, N'TXN20251031202552', 140260912, CAST(900.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/e4c66e32cab4930abbf274cbfb13a9c9', CAST(N'2025-10-31T20:25:53.683' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (102, N'TXN20251101044806', 140323559, CAST(2600.00 AS Decimal(18, 2)), N'dev.info.net.solution', N'dev.info.net.solution@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/8c8e477f555c9bcaa7b7fbc67001135c', CAST(N'2025-11-01T04:48:07.753' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (103, N'TXN20251103090656', 140626185, CAST(2450.00 AS Decimal(18, 2)), N'dev.info.net.solution', N'dev.info.net.solution@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/cd323a78656bdfb4aeb6c90a56850a69', CAST(N'2025-11-03T09:06:57.370' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (104, N'TXN20251104005145', 140688327, CAST(1300.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/c07686f6f50b2004fb9f57a3a8a42464', CAST(N'2025-11-04T00:51:46.190' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (105, N'TXN20251104005148', 140688338, CAST(1300.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/7b1846c09c5ef5d43ab46bf24e8b0411', CAST(N'2025-11-04T00:51:49.370' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (106, N'TXN20251104005343', 140688555, CAST(1300.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/a86f56208d13be839518638ed473aea6', CAST(N'2025-11-04T00:53:44.010' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (107, N'TXN20251104005345', 140688563, CAST(1300.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/f3f211ec80122d9ca6e21a8123f15f1a', CAST(N'2025-11-04T00:53:46.737' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (108, N'TXN20251104005349', 140688570, CAST(1300.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/c4f0af49e896450f83defc80a762e475', CAST(N'2025-11-04T00:53:50.570' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (109, N'TXN20251104005354', 140688580, CAST(650.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/45d0979e33a604f15f2176ca259b33c0', CAST(N'2025-11-04T00:53:55.107' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (110, N'TXN20251104005510', 140688749, CAST(1300.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/d199445c3b21ee1b57fcac8860c2d1fa', CAST(N'2025-11-04T00:55:11.630' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (111, N'TXN20251105074227', 140888145, CAST(1300.00 AS Decimal(18, 2)), N'dipvai8617', N'dipvai8617@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/1d34e1f7f9f932ae83fd02b698780d3a', CAST(N'2025-11-05T07:42:28.557' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (112, N'TXN20251105085116', 140895850, CAST(650.00 AS Decimal(18, 2)), N'dipvai8617', N'dipvai8617@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/166d11036e00fb8528af4bfb789583fa', CAST(N'2025-11-05T08:51:17.973' AS DateTime), 0, NULL)
+GO
+INSERT [dbo].[PaymentOrders] ([Id], [ClientTxnId], [OrderId], [Amount], [CustomerName], [CustomerEmail], [CustomerMobile], [PaymentUrl], [CreatedAt], [PaymentStatus], [UserID]) VALUES (113, N'TXN20251107070415', 141144273, CAST(1300.00 AS Decimal(18, 2)), N'karma936sc', N'karma936sc@gmail.com', N'9132678956', N'https://qrstuff.me/gateway/pay/4eec9a33e093b9492c416cae0be87cef', CAST(N'2025-11-07T07:04:16.150' AS DateTime), 0, NULL)
+GO
+SET IDENTITY_INSERT [dbo].[PaymentOrders] OFF
+GO
+SET IDENTITY_INSERT [dbo].[UserRegistration] ON 
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (1, N'Muhammad Ahmad Amin', N'dev.info.net.solution@gmail.com', N'123', N'123', CAST(N'2025-09-18T02:31:32.017' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (2, N'ttttt', N'karma935sc@gmail.com', N'123456', N'123456', CAST(N'2025-09-18T09:03:57.637' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (3, N'Sx', N'karma935sc@gmail.com', N'mAula@2019@@', N'mAula@2019@@', CAST(N'2025-09-21T02:31:53.287' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (4, N'Shivam', N'soldusanjana@gmail.com', N'Moto@2001', N'Moto@2001', CAST(N'2025-09-21T07:06:15.580' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (5, N'Kartik', N'Kartik281328@gmail.com', N'pm786786', N'pm786786', CAST(N'2025-09-22T23:26:31.400' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (6, N'ttttt', N'karma936sc@gmail.com', N'mAula@2019@@', N'mAula@2019@@', CAST(N'2025-09-25T08:59:58.967' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (7, N'Sc randi', N'mohanjaiswalmumbai@gmail.com', N'2005', N'2005', CAST(N'2025-09-25T12:23:45.663' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (10, N'Muhammad Ahmad Amin', N'hafizmuhammadahmadamin@gmail.com', N'123', N'123', CAST(N'2025-09-27T04:58:33.960' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (11, N'8092206316', N'nazimdbg794@gmail.com', N'Nazim@123', N'Nazim@123', CAST(N'2025-10-16T10:48:10.040' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (12, N'Kartik', N'Kartik281328@gmail.com', N'pm786786', N'pm786786', CAST(N'2025-10-16T11:11:59.993' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (13, N'Kartik', N'Kartik281328@gmail.com', N'pm786786', N'pm786786', CAST(N'2025-10-16T11:12:53.720' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (14, N'ttttt', N'karma936sc@gmail.com', N'mAula@2019@@', N'mAula@2019@@', CAST(N'2025-10-16T11:29:55.863' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (15, N'ttttt', N'karma936sc@gmail.com', N'mAula@2019@@', N'mAula@2019@@', CAST(N'2025-10-16T13:29:29.170' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (16, N'Rohit singh', N'assamese145@gmail.com', N'Assam@123', N'Assam@123', CAST(N'2025-10-16T13:36:15.767' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (17, N'Gita', N'gitadevi8412211@gmail.com', N'Passwerd420@', N'Passwerd420@', CAST(N'2025-10-16T16:11:55.183' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (18, N'Anshu', N'travelchoudhary933@gmail.com', N'Anshu00', N'Anshu00', CAST(N'2025-10-17T12:20:49.610' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (19, N'Shree Hari', N'radhabalav2005@gmail.com', N'SCBH@!123', N'SCBH@!123', CAST(N'2025-10-18T13:19:52.103' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (21, N'Ticket Mafiya', N'Info.mithilacommunication@gmail.com', N'Nkjha@123', N'Nkjha@123', CAST(N'2025-10-19T10:08:52.377' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (22, N'Ticket Mafiya', N'Info.mithilacommunication@gmail.com', N'Nkjha@123', N'Nkjha@123', CAST(N'2025-10-19T10:09:18.630' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (23, N'Mdraza', N'Mdrazansa@gmail.com', N'Jnssrs@5050', N'Jnssrs@5050', CAST(N'2025-10-19T20:52:29.247' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (24, N'MUKESH', N'scsindia822@gmail.com', N'MUKESH', N'MUKESH', CAST(N'2025-10-20T22:58:00.970' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (25, N'RAJBHAI', N'ranisk24f@gmail.com', N'Rajbhai123', N'Rajbhai123', CAST(N'2025-10-25T20:27:01.447' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (26, N'Sufi', N'msd36563@gmail.com', N'Aliy@9503', N'Aliy@9503', CAST(N'2025-10-26T07:43:39.893' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (27, N'Dip', N'dipvai8617@gmail.com', N'Dibyendu@1', N'Dibyendu@1', CAST(N'2025-11-05T07:38:58.117' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (28, N'Jevin', N'jevinbasumatary8@gmail.com', N'Jevin123', N'Jevin123', CAST(N'2025-11-07T03:23:58.480' AS DateTime))
+GO
+INSERT [dbo].[UserRegistration] ([UserID], [FullName], [Email], [Password], [ConfirmPassword], [CreatedDate]) VALUES (29, N'Jevin', N'jevinbasumatary8@gmail.com', N'Dheeraj123', N'Dheeraj123', CAST(N'2025-11-07T03:24:27.410' AS DateTime))
+GO
+SET IDENTITY_INSERT [dbo].[UserRegistration] OFF
+GO
+SET IDENTITY_INSERT [dbo].[VpsOrders] ON 
+GO
+INSERT [dbo].[VpsOrders] ([Id], [ClientTransactionID], [IP], [OS], [Username], [Password], [ActionStatus], [MachineStatus], [PowerStatus], [RAM], [ExpiryDate], [CreatedAt], [UserID]) VALUES (2, N'TXN20250923213146', N'43.225.74.7', N'Windows 2022 64', N'Administrator', N'jYYe98#t5X@vE0+-', N'processing', N'active', N'Offline', N'8192 MB', CAST(N'2025-10-23T20:19:24.027' AS DateTime), CAST(N'2025-09-23T07:49:38.267' AS DateTime), 1)
+GO
+INSERT [dbo].[VpsOrders] ([Id], [ClientTransactionID], [IP], [OS], [Username], [Password], [ActionStatus], [MachineStatus], [PowerStatus], [RAM], [ExpiryDate], [CreatedAt], [UserID]) VALUES (3, N'TXN20250925091921', N'103.148.66.14', N'Ubuntu 22 64', N'root', NULL, N'pending', N'active', N'Offline', N'4096 MB', CAST(N'2025-10-25T21:51:17.887' AS DateTime), CAST(N'2025-09-25T09:21:18.943' AS DateTime), 6)
+GO
+INSERT [dbo].[VpsOrders] ([Id], [ClientTransactionID], [IP], [OS], [Username], [Password], [ActionStatus], [MachineStatus], [PowerStatus], [RAM], [ExpiryDate], [CreatedAt], [UserID]) VALUES (6, N'TXN20250927140057', N'103.148.66.3', N'Windows 2022 64', N'Administrator', NULL, N'pending', N'active', N'Offline', N'8192 MB', CAST(N'2025-10-27T14:35:02.267' AS DateTime), CAST(N'2025-09-27T02:05:04.023' AS DateTime), 1)
+GO
+INSERT [dbo].[VpsOrders] ([Id], [ClientTransactionID], [IP], [OS], [Username], [Password], [ActionStatus], [MachineStatus], [PowerStatus], [RAM], [ExpiryDate], [CreatedAt], [UserID]) VALUES (8, N'TXN20251017004548', N'160.191.29.99', N'Ubuntu 20 64', N'dev.info.net.solution', N'', N'success', N'Running', N'Running', N'4', CAST(N'2025-11-17T00:47:25.233' AS DateTime), CAST(N'2025-10-16T12:47:26.270' AS DateTime), 1)
+GO
+INSERT [dbo].[VpsOrders] ([Id], [ClientTransactionID], [IP], [OS], [Username], [Password], [ActionStatus], [MachineStatus], [PowerStatus], [RAM], [ExpiryDate], [CreatedAt], [UserID]) VALUES (9, N'TXN20251017011309', N'103.148.66.34', N'Ubuntu 22 64', N'root', NULL, N'pending', N'active', N'Offline', N'4096 MB', CAST(N'2025-11-17T01:46:56.097' AS DateTime), CAST(N'2025-10-16T13:17:25.460' AS DateTime), 1)
+GO
+INSERT [dbo].[VpsOrders] ([Id], [ClientTransactionID], [IP], [OS], [Username], [Password], [ActionStatus], [MachineStatus], [PowerStatus], [RAM], [ExpiryDate], [CreatedAt], [UserID]) VALUES (14, N'TXN20251107225202', N'192.168.10.16', N'Windows 11', N'dev.info.net.solution@gmail.com', N'testing@125', N'Active', N'Running', N'Running', N'8', CAST(N'2025-11-28T22:48:00.000' AS DateTime), CAST(N'2025-11-07T09:52:03.200' AS DateTime), 1)
+GO
+SET IDENTITY_INSERT [dbo].[VpsOrders] OFF
+GO
+ALTER TABLE [dbo].[ChatMessages] ADD  DEFAULT (getdate()) FOR [SentAt]
+GO
+ALTER TABLE [dbo].[PaymentOrders] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+ALTER TABLE [dbo].[PaymentOrders] ADD  CONSTRAINT [DF_PaymentOrders_PaymentStatus]  DEFAULT ((0)) FOR [PaymentStatus]
+GO
+ALTER TABLE [dbo].[UserRegistration] ADD  CONSTRAINT [DF_UserRegistration_CreatedDate]  DEFAULT (getdate()) FOR [CreatedDate]
+GO
+ALTER TABLE [dbo].[VpsOrders] ADD  DEFAULT (getdate()) FOR [CreatedAt]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_ChangePassword]    Script Date: 08/11/2025 1:24:00 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+-- Change Password
+CREATE PROCEDURE [dbo].[sp_ChangePassword]
+    @UserID INT,
+    @CurrentPassword NVARCHAR(100),
+    @NewPassword NVARCHAR(100)
+AS
+BEGIN
+    IF EXISTS (SELECT 1 FROM UserRegistration WHERE UserID = @UserID AND Password = @CurrentPassword)
+    BEGIN
+        UPDATE UserRegistration
+        SET Password = @NewPassword, ConfirmPassword = @NewPassword
+        WHERE UserID = @UserID;
+        SELECT 1;
+    END
+    ELSE
+    BEGIN
+         UPDATE UserRegistration
+        SET Password = @NewPassword, ConfirmPassword = @NewPassword
+        WHERE UserID = @UserID;
+        SELECT 1;;
+    END
+END
+GO
+/****** Object:  StoredProcedure [dbo].[sp_GetChatHistory]    Script Date: 08/11/2025 1:24:00 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_GetChatHistory]
+    @RoomEmail NVARCHAR(200)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT Sender, Message, SentAt
+    FROM ChatMessages
+    WHERE RoomEmail = @RoomEmail
+    ORDER BY SentAt;
+END;
+GO
+/****** Object:  StoredProcedure [dbo].[SP_GetOrders]    Script Date: 08/11/2025 1:24:00 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[SP_GetOrders]
+    @UserID INT,
+    @Keyword NVARCHAR(100) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        Id,
+        ClientTransactionID,
+        IP,
+        OS,
+        Username,
+        Password,
+        ActionStatus,
+        MachineStatus,
+        PowerStatus,
+        RAM,
+        ExpiryDate,
+        CreatedAt,
+        UserID
+    FROM VpsOrders
+    WHERE UserID = @UserID
+      AND (
+            @Keyword IS NULL 
+            OR @Keyword = ''
+            OR IP LIKE '%' + @Keyword + '%'
+            OR OS LIKE '%' + @Keyword + '%'
+            OR Username LIKE '%' + @Keyword + '%'
+            OR ClientTransactionID LIKE '%' + @Keyword + '%'
+          )
+    ORDER BY ExpiryDate DESC;
+END;
+GO
+/****** Object:  StoredProcedure [dbo].[SP_GetOrdersForAdmin]    Script Date: 08/11/2025 1:24:00 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[SP_GetOrdersForAdmin]
+    @Keyword NVARCHAR(100) = NULL      -- Optional search term
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        o.Id,
+        o.ClientTransactionID,
+        o.IP,
+        o.OS,
+        o.Username,
+        o.Password,
+        o.ActionStatus,
+        o.MachineStatus,
+        o.PowerStatus,
+        o.RAM,
+        o.ExpiryDate,
+        o.CreatedAt,
+        o.UserID,
+        u.FullName AS CustomerName,
+		u.Email
+    FROM VpsOrders o
+    LEFT JOIN UserRegistration u ON o.UserID = u.UserID
+    WHERE 
+       
+            @Keyword IS NULL OR @Keyword = '' OR
+            o.IP LIKE '%' + @Keyword + '%' OR
+            o.OS LIKE '%' + @Keyword + '%' OR
+            o.Username LIKE '%' + @Keyword + '%' OR
+            u.FullName  LIKE '%' + @Keyword + '%' OR
+            o.ClientTransactionID LIKE '%' + @Keyword + '%'
+        
+    ORDER BY o.ExpiryDate DESC;
+END;
+GO
+/****** Object:  StoredProcedure [dbo].[SP_GetPaymentOrder]    Script Date: 08/11/2025 1:24:00 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[SP_GetPaymentOrder]
+    @ClientTxnId NVARCHAR(100)
+AS
+BEGIN
+    SELECT TOP 1 Id, ClientTxnId, CustomerName, CustomerEmail, 
+                 CustomerMobile, Amount, PaymentStatus, CreatedAt
+    FROM PaymentOrders
+    WHERE ClientTxnId = @ClientTxnId;
+END
+GO
+/****** Object:  StoredProcedure [dbo].[sp_GetUserDashboardData]    Script Date: 08/11/2025 1:24:00 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_GetUserDashboardData]
+    @UserID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- User Info 0
+    SELECT FullName, Email, CreatedDate
+    FROM UserRegistration
+    WHERE UserID = @UserID;
+
+    -- Orders Summary 1
+    SELECT 
+        TotalOrders = COUNT(*),
+        ActiveServices = SUM(CASE WHEN MachineStatus = 'active' THEN 1 ELSE 0 END),
+        PendingOrders = SUM(CASE WHEN ActionStatus = 'Pending' THEN 1 ELSE 0 END),
+        CompletedOrders = SUM(CASE WHEN ActionStatus = 'processing' THEN 1 ELSE 0 END),
+        FailedOrders = SUM(CASE WHEN ActionStatus = 'Failed' THEN 1 ELSE 0 END)
+    FROM VpsOrders
+    WHERE UserID = @UserID;
+
+    -- Payments (Total Spent) 2
+	SELECT SUM(PO.Amount) AS TotalSpent FROM PaymentOrders PO
+	INNER JOIN VpsOrders VO ON VO.ClientTransactionID = PO.ClientTxnId 
+	WHERE VO.UserID = @UserID --AND PO.PaymentStatus = 1
+
+    -- Recent Orders 3
+    SELECT TOP 5 
+        ClientTransactionID, IP, OS, RAM, ActionStatus, ExpiryDate, CreatedAt
+    FROM VpsOrders
+    WHERE UserID = @UserID
+    ORDER BY CreatedAt DESC;
+	
+END
+GO
+/****** Object:  StoredProcedure [dbo].[sp_GetUserProfile]    Script Date: 08/11/2025 1:24:00 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_GetUserProfile]
+    @UserID INT
+AS
+BEGIN
+    SELECT UserID, FullName, Email, Password, CreatedDate
+    FROM UserRegistration
+    WHERE UserID = @UserID;
+END
+GO
+/****** Object:  StoredProcedure [dbo].[SP_InsertVpsOrder]    Script Date: 08/11/2025 1:24:00 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[SP_InsertVpsOrder]
+    @ClientTransactionID NVARCHAR(100),
+    @UserID INT,
+    @IP NVARCHAR(50),
+    @OS NVARCHAR(100),
+    @Username NVARCHAR(100),
+    @Password NVARCHAR(200),
+    @ActionStatus NVARCHAR(50),
+    @MachineStatus NVARCHAR(50),
+    @PowerStatus NVARCHAR(50),
+    @RAM NVARCHAR(50),
+    @ExpiryDate DATETIME
+AS
+BEGIN
+    INSERT INTO VpsOrders
+    (ClientTransactionID, UserID, IP, OS, Username, Password, ActionStatus, MachineStatus, PowerStatus, RAM, ExpiryDate, CreatedAt)
+    VALUES
+    (@ClientTransactionID, @UserID, @IP, @OS, @Username, @Password, @ActionStatus, @MachineStatus, @PowerStatus, @RAM, @ExpiryDate, GETDATE());
+END
+GO
+/****** Object:  StoredProcedure [dbo].[sp_SaveChatMessage]    Script Date: 08/11/2025 1:24:00 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[sp_SaveChatMessage]
+    @RoomEmail NVARCHAR(200),
+    @Sender NVARCHAR(100),
+    @Message NVARCHAR(MAX)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO ChatMessages (RoomEmail, Sender, Message)
+    VALUES (@RoomEmail, @Sender, @Message);
+END;
+GO
+/****** Object:  StoredProcedure [dbo].[SP_UpdatePaymentStatus]    Script Date: 08/11/2025 1:24:00 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[SP_UpdatePaymentStatus]
+    @ClientTxnId NVARCHAR(100)
+AS
+BEGIN
+    UPDATE PaymentOrders
+    SET PaymentStatus = 1
+    WHERE ClientTxnId = @ClientTxnId;
+END
+
+
+GO
+/****** Object:  StoredProcedure [dbo].[SP_UserRegistration]    Script Date: 08/11/2025 1:24:00 pm ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[SP_UserRegistration]
+@Mode INT = NULL,
+@FullName VARCHAR(MAX) = NULL,
+@Email VARCHAR(MAX) = NULL,
+@Password VARCHAR(MAX) = NULL,
+@ConfirmPassword VARCHAR(MAX) = NULL
+AS
+BEGIN
+	IF @Mode = 1 
+	BEGIN 
+		INSERT INTO [UserRegistration]
+			   ([FullName]
+			   ,[Email]
+			   ,[Password]
+			   ,[ConfirmPassword]
+			   )
+		 VALUES
+			   (@FullName
+			   ,@Email
+			   ,@Password
+			   ,@ConfirmPassword)
+
+	END
+	ELSE IF @Mode = 2 
+	BEGIN 
+		 SELECT TOP 1 *
+    FROM [UserRegistration]
+    WHERE Email = @Email AND Password = @Password
+	END
+END
+GO
+USE [master]
+GO
+ALTER DATABASE [db_abe38f_scbhai0070] SET  READ_WRITE 
+GO

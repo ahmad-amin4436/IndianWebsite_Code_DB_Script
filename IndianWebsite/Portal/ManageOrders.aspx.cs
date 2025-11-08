@@ -66,6 +66,8 @@ public partial class Portal_ManageOrders : System.Web.UI.Page
                 {
                     CustomerName = row["CustomerName"].ToString();
                     Email = row["Email"].ToString();
+                    btnAssignServer.Visible = true;  // 👈 Makes it visible
+
                 }
                 StringContent content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
                 HttpResponseMessage response = await client.PostAsync("https://smartvps.online/api/oceansmart/status", content);
@@ -110,7 +112,20 @@ public partial class Portal_ManageOrders : System.Web.UI.Page
                                     // Skip if response is just "error"
                                     if (cleanjson.Equals("error", StringComparison.OrdinalIgnoreCase))
                                     {
-                                        continue; // skip this IP
+                                        dtApiResults.Rows.Add(
+                                           row["IP"].ToString(),
+                                           row["OS"].ToString(),
+                                           row["Username"].ToString(),
+                                           row["Password"].ToString(),
+                                           row["ActionStatus"].ToString(),
+                                           row["MachineStatus"].ToString(),
+                                           row["PowerStatus"].ToString(),
+                                           $"{row["RAM"].ToString()} GB/MB",
+                                           "", // expiry date placeholder
+                                           CustomerName,
+                                           Email
+                                       );
+                                    continue; // skip this IP
                                     }
 
                                 var apiResponse = JsonConvert.DeserializeObject<HostDzireApiResponse>(cleanjson);
@@ -152,8 +167,20 @@ public partial class Portal_ManageOrders : System.Web.UI.Page
 
                             else
                                 {
-                                    Console.WriteLine($"Failed ({(int)responseHD.StatusCode}): {responseText}");
-                                }
+                                dtApiResults.Rows.Add(
+                                      row["IP"].ToString(),
+                                      row["OS"].ToString(),
+                                      row["Username"].ToString(),
+                                      row["Password"].ToString(),
+                                      row["ActionStatus"].ToString(),
+                                      row["MachineStatus"].ToString(),
+                                      row["PowerStatus"].ToString(),
+                                      $"{row["RAM"].ToString()} MB",
+                                      "", // expiry date placeholder
+                                      CustomerName,
+                                      Email
+                                  );
+                            }
                             }
 
 

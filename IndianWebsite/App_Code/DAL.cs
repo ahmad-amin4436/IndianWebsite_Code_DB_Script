@@ -153,6 +153,7 @@ public class DAL
 
         }
     }
+
     public DataTable GetOrders(int userId, string search)
     {
         DataTable dt = new DataTable();
@@ -302,5 +303,18 @@ public class DAL
         }
 
         return messages;
+    }
+    public DataTable LoadUsers()
+    {
+        DataTable dt = new DataTable();
+        using (SqlConnection conn = new SqlConnection(cs))
+        using (SqlCommand cmd = new SqlCommand("SELECT UserID, Email FROM UserRegistration ORDER BY Email", conn))
+        {
+            conn.Open();
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            
+            da.Fill(dt);
+        }
+        return dt;
     }
 }

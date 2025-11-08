@@ -47,6 +47,15 @@
                                 Text="Clear"
                                 CssClass="btn btn-outline-primary btn-lg"
                                 OnClick="btnClear_Click" />
+                            <asp:HyperLink ID="btnAssignServer"
+                                runat="server"
+                                Visible="false"
+                                Text="Assign Server"
+                                NavigateUrl="~/Portal/assignserver.aspx"
+                                CssClass="btn btn-outline-primary btn-lg" />
+                                
+
+
                         </div>
                     </div>
                 </div>

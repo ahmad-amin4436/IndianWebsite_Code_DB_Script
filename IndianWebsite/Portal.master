@@ -18,6 +18,12 @@
 
     <!-- Bootstrap CSS -->
     <link href="<%= ResolveUrl("~/assets/vendor/bootstrap/5.1.3/bootstrap.min.css") %>" rel="stylesheet" />
+    <!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<!-- jQuery (required) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com/" />
@@ -230,7 +236,7 @@
 								</div>	
 								<p class="p-v2 mw-440">The most affordable premium Linux VPS hosting provider. We make professional hosting accessible to everyone with transparent pricing, reliable performance, and expert support.</p>
 								<h5>COSMOSRECOG</h5>
-								<p class="p-v2 mw-440"><span>Nainital Almora Road, </span><span>Uttrakhand 263132 </span><span>7972499728 </span><br /><span>Cosmosrecog@outlook.com</span></p>
+								<p class="p-v2 mw-440"><span>Nainital Almora Road, </span><span>Uttrakhand 263132 </span><br/><span>7972499728 </span><br /><span>Cosmosrecog@outlook.com</span></p>
 							</div>
 							<div class="col-sm-12 col-md-6 col-lg-3 footer-main-small-col widget_nav_menu">
 								<h5>COSMOSRECOG Quick Links</h5>

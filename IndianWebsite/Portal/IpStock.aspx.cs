@@ -638,9 +638,9 @@ public partial class Portal_IpStock : System.Web.UI.Page
 
         // 🔹 Default / Silver
         if (ram == 4) return 650;
-        if (ram == 8) return 900;
-        if (ram == 16) return 1300;
-        if (ram == 32) return 2450;
+        if (ram == 8) return 1150;
+        if (ram == 16) return 2100;
+        if (ram == 32) return 3600;
 
         // 🔹 Fallback: if none matched (unknown IP or RAM)
         // Pick the closest default or minimum safe value

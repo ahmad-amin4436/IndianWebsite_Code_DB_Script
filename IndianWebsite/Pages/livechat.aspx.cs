@@ -116,7 +116,7 @@ public partial class Pages_livechat : System.Web.UI.Page
                 $"📧 Customer Email: {customerEmail}\n" +
                 $"🕒 Joined At: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\n\n" +
                 $"Please join the live chat dashboard to assist them.\n\n" +
-                $"— CosmosRecog Chat System : {link}";
+                $"Login first and then Open CosmosRecog Chat System : {link}";
 
             SmtpClient smtp = new SmtpClient
             {

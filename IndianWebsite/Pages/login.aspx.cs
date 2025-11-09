@@ -6,7 +6,10 @@ public partial class Pages_login : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-       
+        Session["Email"] = "";
+        Session["Password"] = "";
+        Session["CustomerName"] = "";
+        Session["UserID"] = "";
     }
 
     protected void btnLogin_Click(object sender, EventArgs e)

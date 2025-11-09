@@ -7,6 +7,12 @@ public partial class Portal_Profile : System.Web.UI.Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
+        if (Session["Email"] == null || Session["Password"] == null || Session["CustomerName"] == null)
+        {
+            Response.Redirect("~/Default.aspx", false);
+            Context.ApplicationInstance.CompleteRequest(); // prevent ThreadAbortException
+            return;
+        }
         if (!IsPostBack)
         {
             LoadProfile();

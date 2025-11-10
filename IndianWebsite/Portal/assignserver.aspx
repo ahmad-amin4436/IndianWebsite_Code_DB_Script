@@ -32,6 +32,10 @@
                 <label for="txtIP" class="form-label">IP Address</label>
                 <asp:TextBox ID="txtIP" runat="server"  placeholder="Enter IP Address"></asp:TextBox>
               </div>
+              <div class="form-group mt-3">
+                <label for="txtIP" class="form-label">Username</label>
+                <asp:TextBox ID="txtUsername" runat="server"  placeholder="Enter Username"></asp:TextBox>
+              </div>
 
               <div class="form-group mt-3">
                 <label for="txtPassword" class="form-label">Password</label>

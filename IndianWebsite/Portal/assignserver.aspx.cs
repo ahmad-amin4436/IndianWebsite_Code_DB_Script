@@ -46,7 +46,7 @@ public partial class Portal_assignserver : System.Web.UI.Page
                 userId,
                 txtIP.Text.Trim(),
                 txtOS.Text.Trim(),
-                ddlUserEmail.SelectedItem.Text,
+                txtUsername.Text,
                 txtPassword.Text.Trim(),
                 "Active",
                 "Running",

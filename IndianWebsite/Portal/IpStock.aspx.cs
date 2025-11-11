@@ -615,9 +615,9 @@ public partial class Portal_IpStock : System.Web.UI.Page
         if (ip.Contains("163.223") || ip.Contains("163.227"))
         {
             if (ram == 4) return 700;
-            if (ram == 8) return 1300;
-            if (ram == 16) return 2500;
-            if (ram == 32) return 5000;
+            if (ram == 8) return 1150;
+            if (ram == 16) return 2100;
+            if (ram == 32) return 3600;
         }
 
         // 🔹 Gold IP ranges (SmartVPS legacy)

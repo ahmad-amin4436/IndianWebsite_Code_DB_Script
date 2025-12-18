@@ -1,10 +1,14 @@
 ﻿using Microsoft.AspNet.SignalR;
 using Renci.SshNet;
+using Renci.SshNet.Common;
+using System;
 using System.Collections.Concurrent;
+using System.Text;
 using System.Threading.Tasks;
 
 public class SshHub : Hub
 {
+    // Keep track of user SSH sessions
     private static ConcurrentDictionary<string, ShellStream> userShells =
         new ConcurrentDictionary<string, ShellStream>();
 
@@ -15,47 +19,120 @@ public class SshHub : Hub
     {
         string connectionId = Context.ConnectionId;
 
-        var client = new SshClient(host, user, pass);
-        client.Connect();
-
-        var shell = client.CreateShellStream("xterm", 80, 24, 800, 600, 1024);
-        shell.WriteLine("stty -echo"); // disable remote echo
-
-        userShells[connectionId] = shell;
-        userClients[connectionId] = client;
-
-        // Read SSH output continuously
-        Task.Run(() =>
+        // Prevent multiple connections
+        if (userClients.ContainsKey(connectionId))
         {
-            while (client.IsConnected)
+            Clients.Client(connectionId).ReceiveError("Already connected. Disconnect first.");
+            return;
+        }
+
+        try
+        {
+            var client = new SshClient(host, user, pass);
+            client.Connect();
+
+            if (!client.IsConnected)
             {
-                string output = shell.Read();
-                if (!string.IsNullOrEmpty(output))
-                    Clients.Client(connectionId).ReceiveOutput(output);
+                Clients.Client(connectionId).ReceiveError("SSH connection failed.");
+                return;
             }
-        });
+
+            // Create shell stream
+            var shell = client.CreateShellStream("xterm", 80, 24, 800, 600, 1024);
+            shell.WriteLine("stty -echo"); // disable remote echo
+
+            userClients[connectionId] = client;
+            userShells[connectionId] = shell;
+
+            Clients.Client(connectionId).ConnectionStatus("connected", $"Connected to {user}@{host}");
+
+            // Read output asynchronously
+            Task.Run(async () =>
+            {
+                var buffer = new byte[1024];
+
+                while (client.IsConnected && shell.CanRead)
+                {
+                    try
+                    {
+                        int read = await shell.ReadAsync(buffer, 0, buffer.Length);
+
+                        if (read > 0)
+                        {
+                            string output = Encoding.UTF8.GetString(buffer, 0, read);
+                            Clients.Client(connectionId).ReceiveOutput(output);
+                        }
+                        else
+                        {
+                            // Prevent tight loop if no data
+                            await Task.Delay(10);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Clients.Client(connectionId).ReceiveError($"Read error: {ex.Message}");
+                        break;
+                    }
+                }
+
+                // Clean up after disconnect
+                DisconnectSSH();
+            });
+        }
+        catch (Exception ex)
+        {
+            Clients.Client(connectionId).ReceiveError($"SSH connection failed: {ex.Message}");
+            DisconnectSSH();
+        }
     }
 
     public void SendInput(string input)
     {
-        string id = Context.ConnectionId;
+        string connectionId = Context.ConnectionId;
 
-        if (userShells.TryGetValue(id, out ShellStream shell))
+        if (userShells.TryGetValue(connectionId, out ShellStream shell) && shell.CanWrite)
         {
-            shell.Write(input);
+            try
+            {
+                shell.Write(input);
+            }
+            catch (Exception ex)
+            {
+                Clients.Client(connectionId).ReceiveError($"Send input failed: {ex.Message}");
+            }
         }
     }
 
-    public override System.Threading.Tasks.Task OnDisconnected(bool stopCalled)
+    public void DisconnectSSH()
     {
-        string id = Context.ConnectionId;
+        string connectionId = Context.ConnectionId;
 
-        if (userClients.TryRemove(id, out SshClient client))
-            client.Dispose();
+        if (userClients.TryRemove(connectionId, out SshClient client))
+        {
+            try
+            {
+                if (client.IsConnected)
+                    client.Disconnect();
+            }
+            catch { }
+            finally
+            {
+                client.Dispose();
+            }
+        }
 
-        if (userShells.TryRemove(id, out ShellStream shell))
-            shell.Dispose();
+        if (userShells.TryRemove(connectionId, out ShellStream shell))
+        {
+            try { shell.Dispose(); } catch { }
+        }
 
+        Clients.Client(connectionId).ConnectionStatus("disconnected", "Disconnected");
+    }
+
+    public override Task OnDisconnected(bool stopCalled)
+    {
+        // Ensure cleanup on disconnect
+        DisconnectSSH();
         return base.OnDisconnected(stopCalled);
     }
 }

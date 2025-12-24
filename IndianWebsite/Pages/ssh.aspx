@@ -14,7 +14,12 @@
             align-items: center;
             font-family: 'Segoe UI', 'Roboto', sans-serif;
         }
-
+        .xterm-scroll-area{
+            height: auto !important;
+        }
+        .xterm-helpers{
+            display:;
+        }
         .ssh-card {
             width: 100%;
             max-width: 850px;
@@ -376,7 +381,7 @@
                     <i class="fas fa-server"></i> Server Host
                 </label>
                 <asp:TextBox ID="txtHost" runat="server"
-                    CssClass="ssh-input" 
+                    CssClass="ssh-input"
                     Placeholder="e.g., 192.168.1.10 or example.com"
                     autocomplete="off">
                 </asp:TextBox>
@@ -387,7 +392,7 @@
                     <i class="fas fa-user"></i> Username
                 </label>
                 <asp:TextBox ID="txtUsername" runat="server"
-                    CssClass="ssh-input" 
+                    CssClass="ssh-input"
                     Placeholder="Enter SSH username"
                     autocomplete="off">
                 </asp:TextBox>
@@ -397,25 +402,14 @@
                 <label class="input-label">
                     <i class="fas fa-key"></i> Password
                 </label>
-                <asp:TextBox ID="txtPassword" runat="server" TextMode="Password"
-                    CssClass="ssh-input" 
+                <asp:TextBox ID="txtPassword" runat="server" 
+                    CssClass="ssh-input" TextMode="Password"
                     Placeholder="Enter SSH password"
                     autocomplete="off">
                 </asp:TextBox>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="quick-actions">
-                <button class="quick-btn" onclick="quickFill('localhost', 'root', '');">
-                    <i class="fas fa-home"></i> Localhost
-                </button>
-                <button class="quick-btn" onclick="quickFill('192.168.1.1', 'admin', 'admin');">
-                    <i class="fas fa-router"></i> Router
-                </button>
-                <button class="quick-btn" onclick="clearCredentials();">
-                    <i class="fas fa-eraser"></i> Clear
-                </button>
-            </div>
+          
 
             <!-- Connect button -->
             <asp:Button ID="btnStart" runat="server" Text="Connect SSH"
@@ -735,11 +729,10 @@
         // Handle Backspace locally
         if (data === '\x7F') { // Backspace
             term.write('\b \b'); // move back, overwrite with space, move back again
-        } else if (data === '\r') { // Enter
-            term.write('\r\n');
         } else {
             term.write(data);
         }
+            term.scrollToBottom();
 
         // Send input to server if connected
         if (isConnected) {
@@ -747,7 +740,28 @@
         }
     });
 
-    term.attachCustomKeyEventHandler(function(event) {
+         term.attachCustomKeyEventHandler(function (event) {
+             if (event.ctrlKey && event.key === 'v') {
+        event.preventDefault();
+
+        if (!isConnected) return false;
+
+        navigator.clipboard.readText()
+            .then(function (text) {
+                if (text) {
+                    // Show pasted text in terminal
+                    term.write(text);
+
+                    // Send whole content at once to SSH
+                    hub.server.sendInput(text);
+                }
+            })
+            .catch(function (err) {
+                console.error("Paste failed:", err);
+            });
+
+        return false;
+    }
         if (event.ctrlKey && event.key === 'c') {
             if (isConnected) {
                 hub.server.sendInput('\x03'); // Ctrl+C

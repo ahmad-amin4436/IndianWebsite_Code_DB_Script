@@ -139,11 +139,15 @@
                 <span class="sk__menu-icon"><span class="icon-info-circle"></span></span>About
             </a>
         </li>
+         <li class="nav-item">
+            <a class="nav-link hvr-underline-from-center" href="<%= ResolveUrl("~/Pages/ssh.aspx") %>">
+                <span class="sk__menu-icon"><span class="icon-linux"></span></span>Cosmosrecog Terminal
+            </a>
+        </li>
 
         <!-- VPS Servers -->
       <li class="nav-item">
     <a class="nav-link hvr-underline-from-center" href="<%= ResolveUrl("~/Pages/server_series.aspx") %>">
-        <span class="sk__menu-icon"><span class="icon-linux"></span></span>
         <span class="sk__menu-icon"><span class="icon-windows"></span></span>
         VPS Servers
     </a>

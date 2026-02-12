@@ -614,10 +614,10 @@ public partial class Portal_IpStock : System.Web.UI.Page
         // 🔹 Gold IP ranges (HostDzire)
         if (ip.Contains("163.223") || ip.Contains("163.227"))
         {
-            if (ram == 4) return 700;
+            if (ram == 4) return 650;
             if (ram == 8) return 1150;
             if (ram == 16) return 2100;
-            if (ram == 32) return 3600;
+            if (ram == 32) return 3700;
         }
 
         // 🔹 Gold IP ranges (SmartVPS legacy)
@@ -639,14 +639,14 @@ public partial class Portal_IpStock : System.Web.UI.Page
         // 🔹 Default / Silver
         if (ram == 4) return 650;
         if (ram == 8) return 1150;
-        if (ram == 16) return 2100;
-        if (ram == 32) return 3600;
+        if (ram == 16) return 1400;
+        if (ram == 32) return 2000;
 
         // 🔹 Fallback: if none matched (unknown IP or RAM)
         // Pick the closest default or minimum safe value
         if (ram < 4) return 650;   // treat as 4GB minimum
-        if (ram > 32) return 2450; // treat as 32GB maximum
-        return 900; // safe mid-tier fallback (8GB pricing)
+        if (ram > 32) return 2000; // treat as 32GB maximum
+        return 1150; // safe mid-tier fallback (8GB pricing)
     }
 
 

@@ -412,9 +412,9 @@
           
 
             <!-- Connect button -->
-            <asp:Button ID="btnStart" runat="server" Text="Connect SSH"
-                CssClass="ssh-btn" OnClientClick="connectSSH(); return false;" />
-
+          <%--<asp:Button ID="btnStart" runat="server" Text="Connect SSH"
+    CssClass="ssh-btn" OnClientClick="return connectSSH();" />--%>
+            <a class="ssh-btn" id="btnStart" onclick="connectSSH();">Connect SSH</a>
             <!-- Terminal Container -->
             <div class="terminal-container">
                 <div class="terminal-header">
@@ -457,9 +457,9 @@
     </div>
 
     <!-- Libraries -->
-    <script src="/Scripts/jquery-3.6.0.min.js"></script>
-    <script src="/Scripts/jquery.signalR-2.4.3.min.js"></script>
-    <script src="/signalr/hubs"></script>
+    <script src="<%= ResolveClientUrl("~/Scripts/jquery-3.6.0.min.js") %>"></script>
+    <script src="<%= ResolveClientUrl("~/Scripts/jquery.signalR-2.4.3.min.js") %>"></script>
+    <script src="<%= ResolveClientUrl("~/signalr/hubs") %>"></script>
     <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.7.0/lib/xterm-addon-fit.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -685,40 +685,35 @@
         });
 
         // Main connection function
-        function connectSSH() {
-            if (isConnected) {
-                if (confirm('Disconnect from current session?')) {
-                    hub.server.disconnectSSH();
-                    updateStatus('disconnected', 'Disconnected');
-                    return;
-                }
-                return;
-            }
-
-            const host = $("#<%=txtHost.ClientID%>").val().trim();
-            const user = $("#<%=txtUsername.ClientID%>").val().trim();
-            const pass = $("#<%=txtPassword.ClientID%>").val();
-
-            if (!host || !user) {
-                updateStatus('error', 'Host and Username are required');
-                return;
-            }
-
-            updateStatus('connecting', `Connecting to ${host}...`);
-            keyCount = 0;
-        
-            $('#sessionInfo').text(`${user}@${host}`);
-        
-            // Initialize terminal if not already
-            if (!term) {
-                initTerminal();
-            }
-        
-            term.clear();
-            term.write(`\x1b[1;36m>>>\x1b[0m Connecting to \x1b[1;33m${user}@${host}\x1b[0m...\r\n\r\n`);
-        
-            hub.server.connectSSH(host, user, pass);
+       function connectSSH() {
+    if (isConnected) {
+        if (confirm('Disconnect?')) {
+            hub.server.disconnectSSH();
+            updateStatus('disconnected', 'Disconnected');
         }
+        return false;
+    }
+
+    const host = $("#<%=txtHost.ClientID%>").val().trim();
+    const user = $("#<%=txtUsername.ClientID%>").val().trim();
+    const pass = $("#<%=txtPassword.ClientID%>").val();
+
+    if (!host || !user) {
+        updateStatus('error', 'Host and Username are required');
+        return false;
+    }
+
+    updateStatus('connecting', `Connecting to ${host}...`);
+    keyCount = 0;
+    $('#sessionInfo').text(`${user}@${host}`);
+    if (!term) initTerminal();
+    term.clear();
+    term.write(`Connecting to ${user}@${host}...\r\n\r\n`);
+    hub.server.connectSSH(host, user, pass);
+
+    return false; // ensure no postback
+}
+
 
         // Terminal input handling
      function setupTerminalInput() {

@@ -131,7 +131,7 @@
                                         <%--<span class="badge-top">
                                             <%# (Convert.ToInt32(Eval("VPS")) >= 4) ? "<i class='icon-star-full'></i> Gold 3.0GHz" 
                                                : (Convert.ToInt32(Eval("VPS")) == 3) ? "<i class='icon-diamond1'></i> Pro AMD" : "<i class='icon-sphere'></i> Silver" %>
-                                        </span>--%><span class="badge-top"><i class='icon-diamond1'></i> Pro AMD   </span>
+                                        </span>--%><span class="badge-top"><i class='icon-diamond1'></i> AMD   </span>
 
                                         <div class="plan-icon"><i class="icon-server"></i></div>
 

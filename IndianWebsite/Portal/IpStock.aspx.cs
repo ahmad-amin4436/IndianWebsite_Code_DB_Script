@@ -661,11 +661,8 @@ public partial class Portal_IpStock : System.Web.UI.Page
         if (ram == 16) return 2300;
         if (ram == 32) return 3700;
 
-        // 🔹 Fallback: if none matched (unknown IP or RAM)
-        // Pick the closest default or minimum safe value
-        if (ram < 4) return 650;   // treat as 4GB minimum
-        if (ram > 32) return 3700; // treat as 32GB maximum
-        return 2300; // safe mid-tier fallback (8GB pricing)
+        
+        return 650; // safe mid-tier fallback (8GB pricing)
     }
 
 

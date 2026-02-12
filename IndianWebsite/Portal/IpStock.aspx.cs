@@ -118,7 +118,7 @@ public partial class Portal_IpStock : System.Web.UI.Page
                         else if (vps > 0) ram = vps;
 
                         // 🔹 Use your new pricing logic
-                        int pricePerUnitINR = GetPrice(ip, ram);
+                        int pricePerUnitINR = GetPriceHD(ip, ram);
                         double totalPriceINR = pricePerUnitINR * qty;
 
                         result.Add(new HostOffer
@@ -616,7 +616,7 @@ public partial class Portal_IpStock : System.Web.UI.Page
         {
             if (ram == 4) return 650;
             if (ram == 8) return 1150;
-            if (ram == 16) return 2100;
+            if (ram == 16) return 2150;
             if (ram == 32) return 3700;
         }
 
@@ -638,7 +638,7 @@ public partial class Portal_IpStock : System.Web.UI.Page
 
         // 🔹 Default / Silver
         if (ram == 4) return 650;
-        if (ram == 8) return 1150;
+        if (ram == 8) return 1000;
         if (ram == 16) return 1400;
         if (ram == 32) return 2000;
 
@@ -647,6 +647,25 @@ public partial class Portal_IpStock : System.Web.UI.Page
         if (ram < 4) return 650;   // treat as 4GB minimum
         if (ram > 32) return 2000; // treat as 32GB maximum
         return 1150; // safe mid-tier fallback (8GB pricing)
+    }
+
+    private int GetPriceHD(string ip, int ram)
+    {
+        ip = ip?.ToLower() ?? "";
+
+       
+
+        // 🔹 Default / Silver
+        if (ram == 4) return 650;
+        if (ram == 8) return 1200;
+        if (ram == 16) return 2300;
+        if (ram == 32) return 3700;
+
+        // 🔹 Fallback: if none matched (unknown IP or RAM)
+        // Pick the closest default or minimum safe value
+        if (ram < 4) return 650;   // treat as 4GB minimum
+        if (ram > 32) return 3700; // treat as 32GB maximum
+        return 2300; // safe mid-tier fallback (8GB pricing)
     }
 
 

@@ -20,10 +20,10 @@ public partial class Portal_IpStock : System.Web.UI.Page
 
     protected async void Page_Load(object sender, EventArgs e)
     {
-        if (Session["Email"] == null || Session["Password"] == null || Session["CustomerName"] == null)
+        if (Session["email"] == null || Session["password"] == null || Session["customername"] == null)
         {
-            Response.Redirect("~/Default.aspx", false);
-            Context.ApplicationInstance.CompleteRequest(); // prevent ThreadAbortException
+            Response.Redirect("~/default.aspx", false);
+            Context.ApplicationInstance.CompleteRequest(); // prevent threadabortexception
             return;
         }
 
@@ -251,28 +251,45 @@ public partial class Portal_IpStock : System.Web.UI.Page
 
             string redirectUrl = "https://cosmosrecogserver.com/Pages/payment_detail";
 
-            // Create order using your existing helper
-            PaymentGatewayHelper PGH = new PaymentGatewayHelper();
             DAL dal = new DAL();
 
-            var orderResponse = await PGH.CreateOrderAsync(
-                txnId,
-                unitPrice.ToString(),
-                $"HostDzire {ip} (PID:{pid}) - {selectedRam}GB - Qty:{qty}",
-                name,
-                email,
+            // Create order using Pay0.shop API
+            var orderResponse = await CreatePay0OrderAsync(
                 mobile,
-                redirectUrl
+                name,
+                unitPrice.ToString("F2", System.Globalization.CultureInfo.InvariantCulture),
+                txnId,
+                redirectUrl,
+                $"HostDzire {ip} (PID:{pid}) - {selectedRam}GB - Qty:{qty}"
             );
 
             if (orderResponse != null && orderResponse.status)
             {
-                // Persist order and redirect
-                dal.SaveOrder(orderResponse, txnId, unitPrice.ToString(), name, email, mobile);
+                // Create a compatible response object for the existing SaveOrder method
+                var compatibleResponse = new PaymentGatewayHelper.CreateOrderResponse
+                {
+                    status = true,
+                    msg = orderResponse.message,
+                    data = new PaymentGatewayHelper.OrderData
+                    {
+                        payment_url = orderResponse.payment_url?.ToString() ?? ""
+                    }
+                };
 
-                Response.Redirect(orderResponse.data.payment_url);
-                Context.ApplicationInstance.CompleteRequest(); // avoid ThreadAbortException
-                return;
+                // Persist order and redirect
+               // dal.SaveOrder(compatibleResponse, txnId, totalAmount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture), name, email, mobile);
+
+                string paymentUrl = orderResponse.payment_url?.ToString();
+                if (!string.IsNullOrEmpty(paymentUrl))
+                {
+                    Response.Redirect(paymentUrl);
+                    Context.ApplicationInstance.CompleteRequest(); // avoid ThreadAbortException
+                    return;
+                }
+                else
+                {
+                    Response.Write("<script>alert('Payment URL not received. Please try again later.');</script>");
+                }
             }
             else
             {
@@ -280,9 +297,118 @@ public partial class Portal_IpStock : System.Web.UI.Page
                 Response.Write("<script>alert('Order creation failed. Please try again later.');</script>");
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             Response.Write("<script>alert('Something went wrong. Please try again later.');</script>");
+        }
+    }
+
+    // ---------------------------
+    // Pay0.shop API Integration
+    // ---------------------------
+    private async Task<dynamic> CreatePay0OrderAsync(string customerMobile, string customerName, string amount, string orderId, string redirectUrl, string remark1 = "", string remark2 = "")
+    {
+        try
+        {
+            // IMPORTANT: Replace with your actual Pay0.shop API key
+            string userToken = "7598222e12176d08fa7164d2b5f24136"; // You need to set your actual API key
+
+            using (var httpClient = new HttpClient())
+            {
+                var postData = new Dictionary<string, string>
+                {
+                    { "customer_mobile", customerMobile },
+                    { "customer_name", customerName },
+                    { "user_token", userToken },
+                    { "amount", amount },
+                    { "order_id", orderId },
+                    { "redirect_url", redirectUrl },
+                    { "remark1", remark1 },
+                    { "remark2", remark2 }
+                };
+
+                var content = new FormUrlEncodedContent(postData);
+                
+                var response = await httpClient.PostAsync("https://pay0.shop/api/create-order", content);
+                var responseString = await response.Content.ReadAsStringAsync();
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    // Parse JSON response
+                    dynamic jsonResponse = Newtonsoft.Json.JsonConvert.DeserializeObject(responseString);
+                    
+                    if (jsonResponse.status == true)
+                    {
+                        return new 
+                        {
+                            status = true,
+                            payment_url = jsonResponse.result.payment_url,
+                            orderId = jsonResponse.result.orderId,
+                            message = jsonResponse.message
+                        };
+                    }
+                    else
+                    {
+                        return new { status = false, message = jsonResponse.message };
+                    }
+                }
+                else
+                {
+                    return new { status = false, message = "API call failed" };
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            return new { status = false, message = $"Exception: {ex.Message}" };
+        }
+    }
+
+    // Optional: Method to check order status
+    private async Task<dynamic> CheckPay0OrderStatusAsync(string orderId)
+    {
+        try
+        {
+            // IMPORTANT: Replace with your actual Pay0.shop API key
+            string userToken = "7598222e12176d08fa7164d2b5f24136"; // You need to set your actual API key
+
+            using (var httpClient = new HttpClient())
+            {
+                var postData = new Dictionary<string, string>
+                {
+                    { "user_token", userToken },
+                    { "order_id", orderId }
+                };
+
+                var content = new FormUrlEncodedContent(postData);
+                
+                var response = await httpClient.PostAsync("https://pay0.shop/api/check-order-status", content);
+                var responseString = await response.Content.ReadAsStringAsync();
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    dynamic jsonResponse = Newtonsoft.Json.JsonConvert.DeserializeObject(responseString);
+                    
+                    return new 
+                    {
+                        status = jsonResponse.status,
+                        message = jsonResponse.message,
+                        txnStatus = jsonResponse.result?.txnStatus,
+                        orderId = jsonResponse.result?.orderId,
+                        amount = jsonResponse.result?.amount,
+                        date = jsonResponse.result?.date,
+                        utr = jsonResponse.result?.utr
+                    };
+                }
+                else
+                {
+                    return new { status = false, message = "API call failed" };
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            return new { status = false, message = $"Exception: {ex.Message}" };
         }
     }
 
@@ -540,32 +666,51 @@ public partial class Portal_IpStock : System.Web.UI.Page
 
             string redirectUrl = "https://cosmosrecogserver.com/Pages/payment_detail";
 
-            PaymentGatewayHelper PGH = new PaymentGatewayHelper();
             DAL dal = new DAL();
 
-            // Call API with RAM + IPv4 included
-            var orderResponse = await PGH.CreateOrderAsync(
-                txnId,
-                amount,
-                $"Plan #{planId} - {ramSelected}GB RAM - {ipv4Count} IPv4",
-                name,
-                email,
+            // Create order using Pay0.shop API
+            var orderResponse = await CreatePay0OrderAsync(
                 mobile,
-                redirectUrl
+                name,
+                amount,
+                txnId,
+                redirectUrl,
+                $"Plan #{planId} - {ramSelected}GB RAM - {ipv4Count} IPv4"
             );
 
             if (orderResponse != null && orderResponse.status)
             {
-                // Save in DB
-                dal.SaveOrder(orderResponse, txnId, amount, name, email, mobile);
+                // Create a compatible response object for the existing SaveOrder method
+                var compatibleResponse = new PaymentGatewayHelper.CreateOrderResponse
+                {
+                    status = true,
+                    msg = orderResponse.message,
+                    data = new PaymentGatewayHelper.OrderData
+                    {
+                        payment_url = orderResponse.payment_url?.ToString() ?? ""
+                    }
+                };
 
-                // Redirect user to payment URL
-                Response.Redirect(orderResponse.data.payment_url);
-                Context.ApplicationInstance.CompleteRequest(); // prevent ThreadAbortException
+                // Save in DB
+                // dal.SaveOrder(compatibleResponse, txnId, amount, name, email, mobile);
+
+                string paymentUrl = orderResponse.payment_url?.ToString();
+                if (!string.IsNullOrEmpty(paymentUrl))
+                {
+                    // Redirect user to payment URL
+                    Response.Redirect(paymentUrl);
+                    Context.ApplicationInstance.CompleteRequest(); // prevent ThreadAbortException
+                    return;
+                }
+                else
+                {
+                    Response.Write("<script>alert('Payment URL not received. Please try again later.');</script>");
+                }
             }
             else
             {
                 // handle failure (show message, log, etc.)
+                Response.Write("<script>alert('Order creation failed. Please try again later.');</script>");
             }
         }
     }

@@ -22,7 +22,7 @@
 										<div class="sk__absolute sk__gradient-back-v1" style="opacity: 0;"></div>
 										<!-- <div id="sk__yt-video-background" class="youtube-video mute" data-youtube-video-id="Lz0xIm-5ikA"></div> -->
 										 <video class="youtube-video mute" autoplay muted loop playsinline>
-										<source src="assets/video/1.mp4" type="video/mp4">
+										<source src="assets/video/1.mp4" type="video/mp4">  
 										Your browser does not support the video tag.
 										</video>
 

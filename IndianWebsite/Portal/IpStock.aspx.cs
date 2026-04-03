@@ -20,9 +20,9 @@ public partial class Portal_IpStock : System.Web.UI.Page
 
     protected async void Page_Load(object sender, EventArgs e)
     {
-        if (Session["email"] == null || Session["password"] == null || Session["customername"] == null)
+        if (Session["Email"] == null || Session["Password"] == null || Session["CustomerName"] == null)
         {
-            Response.Redirect("~/default.aspx", false);
+            Response.Redirect("~/Default.aspx", false);
             Context.ApplicationInstance.CompleteRequest(); // prevent threadabortexception
             return;
         }
@@ -235,7 +235,7 @@ public partial class Portal_IpStock : System.Web.UI.Page
 
             // Generate transaction ID
             string txnId = "TXN" + DateTime.Now.ToString("yyyyMMddHHmmss");
-
+            Session["txnId"] = txnId;
             Session["SelectedPlanId"] = pid;
             Session["RAM"]  = selectedRam;
             Session["SelectedIpv4"] = ip;
@@ -277,7 +277,7 @@ public partial class Portal_IpStock : System.Web.UI.Page
                 };
 
                 // Persist order and redirect
-               // dal.SaveOrder(compatibleResponse, txnId, totalAmount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture), name, email, mobile);
+               dal.SaveOrder(compatibleResponse, txnId, totalAmount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture), name, email, mobile);
 
                 string paymentUrl = orderResponse.payment_url?.ToString();
                 if (!string.IsNullOrEmpty(paymentUrl))
@@ -653,6 +653,7 @@ public partial class Portal_IpStock : System.Web.UI.Page
             string txnId = "TXN" + DateTime.Now.ToString("yyyyMMddHHmmss");
 
             // Store in Session for later use
+            Session["txnId"] = txnId;
             Session["SelectedPlanId"] = planId;
             Session["SelectedRam"] = ramSelected;
             Session["SelectedIpv4"] = ipv4Count;
@@ -692,7 +693,7 @@ public partial class Portal_IpStock : System.Web.UI.Page
                 };
 
                 // Save in DB
-                // dal.SaveOrder(compatibleResponse, txnId, amount, name, email, mobile);
+                dal.SaveOrder(compatibleResponse, txnId, amount, name, email, mobile);
 
                 string paymentUrl = orderResponse.payment_url?.ToString();
                 if (!string.IsNullOrEmpty(paymentUrl))

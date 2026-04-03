@@ -21,6 +21,17 @@ public partial class Pages_payment_detail : Page
         if (!IsPostBack)
         {
             string txnId = Request.QueryString["client_txn_id"];
+            if (Session["txnId"] != null)
+            {
+                txnId = Session["txnId"].ToString();
+            }
+            else
+            {
+                Response.Redirect("~/Default.aspx", false);  // false = don't abort thread
+                Context.ApplicationInstance.CompleteRequest();
+                return;
+
+            }
             if (!string.IsNullOrEmpty(txnId))
                 await LoadTransactionAsync(txnId);
             else

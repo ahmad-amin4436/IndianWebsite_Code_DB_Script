@@ -4238,13 +4238,14 @@ video.sk__video {
 }
 
 .sk__youtube-container .youtube-video {
-	position: absolute;
+	/* position: absolute;
 	top: 0;
 	right: 0;
 	bottom: 0;
 	left: 0;
 	z-index: 1;
-	margin: auto;
+	margin: auto; */
+	width: 100%;
 }
 
 .sk__youtube-container .sk__gradient-back-v1 {

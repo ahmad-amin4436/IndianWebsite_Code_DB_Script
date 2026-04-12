@@ -46,7 +46,7 @@ public class PaymentGatewayHelper
 
     public class OrderData
     {
-        public int order_id { get; set; }
+        public int order_id { get; set; } = 0;
         public string payment_url { get; set; }
     }
 

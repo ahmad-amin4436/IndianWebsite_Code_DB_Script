@@ -24,6 +24,44 @@ public partial class Pages_payment_detail : Page
             if (Session["txnId"] != null)
             {
                 txnId = Session["txnId"].ToString();
+                if (Session["Assign"] == null || !Convert.ToBoolean(Session["Assign"]))
+                {
+                    var result = await CheckPay0OrderStatusAsync(txnId);
+
+                    // 🔴 CASE 1: API FAILURE
+                    if (result == null || result.status == false)
+                    {
+                        Response.Redirect("~/Default.aspx", false);  // false = don't abort thread
+                        Context.ApplicationInstance.CompleteRequest();
+                        return;
+                    }
+
+                    // 🔍 Get txn status
+                    string txnStatus = result.txnStatus?.ToString()?.ToUpper();
+
+                    if (string.IsNullOrEmpty(txnStatus))
+                    {
+                        Response.Redirect("~/Default.aspx", false);  // false = don't abort thread
+                        Context.ApplicationInstance.CompleteRequest();
+                        return;
+                    }
+
+                    // 🟢 CASE 2: SUCCESS
+                    if (txnStatus == "SUCCESS")
+                    {
+                        string orderId = result.orderId?.ToString();
+                        string amount = result.amount?.ToString();
+                        string utr = result.utr?.ToString();
+                    }
+
+                    // 🟡 CASE 3: PENDING
+                    if (txnStatus == "PENDING")
+                    {
+                        Response.Redirect("~/Default.aspx", false);  // false = don't abort thread
+                        Context.ApplicationInstance.CompleteRequest();
+                        return;
+                    }
+                }
             }
             else
             {
@@ -36,6 +74,63 @@ public partial class Pages_payment_detail : Page
                 await LoadTransactionAsync(txnId);
             else
                 ShowNoRecord("Missing or invalid transaction ID.");
+        }
+    }
+    // Optional: Method to check order status
+    private async Task<dynamic> CheckPay0OrderStatusAsync(string orderId)
+    {
+        try
+        {
+            string userToken = "7598222e12176d08fa7164d2b5f24136";
+
+            using (var httpClient = new HttpClient())
+            {
+                var postData = new Dictionary<string, string>
+            {
+                { "user_token", userToken },
+                { "order_id", orderId }
+            };
+
+                var content = new FormUrlEncodedContent(postData);
+
+                // ✅ Proper await
+                var response = await httpClient.PostAsync(
+                    "https://pay0.shop/api/check-order-status",
+                    content
+                );
+
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new
+                    {
+                        status = false,
+                        message = "API call failed"
+                    };
+                }
+
+                dynamic jsonResponse = Newtonsoft.Json.JsonConvert.DeserializeObject(responseString);
+
+                return new
+                {
+                    status = jsonResponse?.status ?? false,
+                    message = jsonResponse?.message ?? "",
+                    txnStatus = jsonResponse?.result?.txnStatus ?? "",
+                    orderId = jsonResponse?.result?.orderId ?? "",
+                    amount = jsonResponse?.result?.amount ?? "0",
+                    date = jsonResponse?.result?.date ?? "",
+                    utr = jsonResponse?.result?.utr ?? ""
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            return new
+            {
+                status = false,
+                message = $"Exception: {ex.Message}"
+            };
         }
     }
 

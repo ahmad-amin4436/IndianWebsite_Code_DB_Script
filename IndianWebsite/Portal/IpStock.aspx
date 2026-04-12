@@ -64,7 +64,6 @@
                                         <span class="badge-top">
                                             <%# Eval("Badge") %>
                                         </span>
-                                        <div class="plan-icon"><i class="icon-server"></i></div>
                                         <h5 class="plan-title"><%# Eval("Title") %></h5>
                                         <p class="plan-desc"><%# Eval("Description") %></p>
 
@@ -99,11 +98,26 @@
                                         <asp:HiddenField ID="hdnPlanId" runat="server" Value='<%# Eval("Id") %>' />
                                         <asp:HiddenField ID="hdnIpv4" runat="server" Value='<%# Eval("Ipv4") %>' />
 
-                                        <asp:Button ID="btnBuyNow" runat="server"
-                                            Text="Buy Now"
-                                            CssClass="btn btn-primary w-100 mt-2"
-                                            CommandName="BuyNow"
-                                            CommandArgument='<%# Eval("Id") %>' />
+                                        <div class="d-grid gap-2">
+                                            <asp:Button ID="btnBuyNow" runat="server"
+                                                Text="Buy Now"
+                                                CssClass="btn btn-primary"
+                                                CommandName="BuyNow"
+                                                CommandArgument='<%# Eval("Id") %>' />
+                                            
+                                            <asp:PlaceHolder ID="phAdminAssign" runat="server" Visible="false">
+                                                <asp:DropDownList ID="ddlAssignUser" runat="server" 
+                                                    CssClass="form-select mb-2" 
+                                                    DataTextField="Email" 
+                                                    DataValueField="UserID">
+                                                </asp:DropDownList>
+                                                <asp:Button ID="btnAssign" runat="server"
+                                                    Text="Assign"
+                                                    CssClass="btn btn-warning"
+                                                    CommandName="Assign"
+                                                    CommandArgument='<%# Eval("Id") %>' />
+                                            </asp:PlaceHolder>
+                                        </div>
                                     </div>
                                 </div>
                             </ItemTemplate>
@@ -133,7 +147,6 @@
                                                : (Convert.ToInt32(Eval("VPS")) == 3) ? "<i class='icon-diamond1'></i> Pro AMD" : "<i class='icon-sphere'></i> Silver" %>
                                         </span>--%><span class="badge-top"><i class='icon-diamond1'></i> AMD   </span>
 
-                                        <div class="plan-icon"><i class="icon-server"></i></div>
 
                                         <!-- Title = IP -->
                                         <h5 class="plan-title"><%# Eval("IP") %></h5>
@@ -162,8 +175,6 @@
                                                 <li><i class="icon-check"></i> <%# Eval("Qty") %> IPv4 addresses</li>
                                                 <li><i class="icon-check"></i> Tier: <%# Eval("VPS") %></li>
                                                 <li><i class="icon-check"></i> PID: <%# Eval("PID") %></li>
-                                                <li><i class="icon-check"></i> Full root access</li>
-                                                <li><i class="icon-check"></i> DDoS Protection</li>
                                             </ul>
                                         </div>
 
@@ -193,11 +204,26 @@ Total Price
 <span id="lblPrice" runat="server" class="fw-bold text-success">
     ₹<%# Eval("PricePerUnit") %>
 </span>
-                                        <asp:Button ID="btnHostBuyNow" runat="server"
-                                            Text="Buy Now"
-                                            CssClass="btn btn-primary w-100 mt-2"
-                                            OnClick="btnHostBuyNow_Click"
-                                            CommandArgument='<%# Eval("IP") %>' />
+                                        <div class="d-grid gap-2">
+                                            <asp:Button ID="btnHostBuyNow" runat="server"
+                                                Text="Buy Now"
+                                                CssClass="btn btn-primary"
+                                                OnClick="btnHostBuyNow_Click"
+                                                CommandArgument='<%# Eval("IP") %>' />
+                                            
+                                            <asp:PlaceHolder ID="phHostAdminAssign" runat="server" Visible="false">
+                                                <asp:DropDownList ID="ddlHostAssignUser" runat="server" 
+                                                    CssClass="form-select mb-2" 
+                                                    DataTextField="Email" 
+                                                    DataValueField="UserID">
+                                                </asp:DropDownList>
+                                                <asp:Button ID="btnHostAssign" runat="server"
+                                                    Text="Assign"
+                                                    CssClass="btn btn-warning"
+                                                    OnClick="btnHostAssign_Click"
+                                                    CommandArgument='<%# Eval("IP") %>' />
+                                            </asp:PlaceHolder>
+                                        </div>
                                     </div>
                                 </div>
                             </ItemTemplate>
@@ -236,5 +262,30 @@ Total Price
         .specs-container { margin-top:16px; background:rgba(255,255,255,0.02); padding:12px; border-radius:8px; }
         .feature-list { list-style:none; padding:0; margin:0; color:#cfcfcf; }
         .feature-list li { padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.02); }
+        
+        /* Assign button darkstar theme */
+        .btn-warning { 
+            background: linear-gradient(135deg, #ff6b35, #f7931e); 
+            border: none; 
+            color: #fff; 
+            font-weight: 600; 
+            transition: all 0.3s ease; 
+        }
+        .btn-warning:hover { 
+            background: linear-gradient(135deg, #f7931e, #ff6b35); 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 20px rgba(255,107,53,0.4); 
+        }
+        .form-select { 
+            background: #1a1a1b; 
+            border: 1px solid rgba(128,71,255,0.2); 
+            color: #fff; 
+        }
+        .form-select:focus { 
+            background: #1a1a1b; 
+            border-color: #8a3cff; 
+            box-shadow: 0 0 0 0.2rem rgba(138,60,255,0.25); 
+            color: #fff; 
+        }
     </style>
 </asp:Content>

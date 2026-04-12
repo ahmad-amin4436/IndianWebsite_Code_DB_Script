@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -29,9 +30,60 @@ public partial class Portal_IpStock : System.Web.UI.Page
 
         if (!IsPostBack)
         {
+            // Load users for admin assignment dropdown
+            LoadUsersForAssignment();
+            
             // Load HostDzire offers first (cached) then bind IP plans (also cached)
             await BindHostDzireAsync();
             await BindIpPlans();
+        }
+    }
+
+    // ---------------------------
+    // Admin assignment methods
+    // ---------------------------
+    private void LoadUsersForAssignment()
+    {
+        try
+        {
+            DAL dal = new DAL();
+            var users = dal.LoadUsers(); // Use existing LoadUsers method
+            
+            if (users != null)
+            {
+                ViewState["AllUsers"] = users;
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log error if needed
+            ViewState["AllUsers"] = new System.Data.DataTable();
+        }
+    }
+
+    private bool IsAdmin()
+    {
+        return Session["UserID"] != null && Session["UserID"].ToString() == "19";
+    }
+
+    private string GetUserEmailById(int userId)
+    {
+        try
+        {
+            var users = ViewState["AllUsers"] as System.Data.DataTable;
+            if (users != null)
+            {
+                var userRow = users.Select($"UserID = {userId}");
+                if (userRow.Length > 0)
+                {
+                    return userRow[0]["Email"].ToString();
+                }
+            }
+            return "user@example.com"; // fallback
+        }
+        catch
+        {
+            return "user@example.com"; // fallback
         }
     }
 
@@ -200,6 +252,35 @@ public partial class Portal_IpStock : System.Web.UI.Page
 
         // Optionally set hidden vps value
         if (hdnVps != null) hdnVps.Value = vpsTier.ToString();
+
+        // Show admin assignment controls if user is admin
+        var phHostAdminAssign = (PlaceHolder)e.Item.FindControl("phHostAdminAssign");
+        var ddlHostAssignUser = (DropDownList)e.Item.FindControl("ddlHostAssignUser");
+        
+        if (phHostAdminAssign != null && ddlHostAssignUser != null)
+        {
+            if (IsAdmin())
+            {
+                phHostAdminAssign.Visible = true;
+                
+                // Bind users to dropdown
+                var users = ViewState["AllUsers"] as System.Data.DataTable;
+                if (users != null && users.Rows.Count > 0)
+                {
+                    ddlHostAssignUser.DataSource = users;
+                    ddlHostAssignUser.DataTextField = "Email";
+                    ddlHostAssignUser.DataValueField = "UserID";
+                    ddlHostAssignUser.DataBind();
+                    
+                    // Add default option
+                    ddlHostAssignUser.Items.Insert(0, new ListItem("Select User", ""));
+                }
+            }
+            else
+            {
+                phHostAdminAssign.Visible = false;
+            }
+        }
     }
 
     protected async void btnHostBuyNow_Click(object sender, EventArgs e)
@@ -236,6 +317,7 @@ public partial class Portal_IpStock : System.Web.UI.Page
             // Generate transaction ID
             string txnId = "TXN" + DateTime.Now.ToString("yyyyMMddHHmmss");
             Session["txnId"] = txnId;
+            Session["Assign"] = false;
             Session["SelectedPlanId"] = pid;
             Session["RAM"]  = selectedRam;
             Session["SelectedIpv4"] = ip;
@@ -302,7 +384,111 @@ public partial class Portal_IpStock : System.Web.UI.Page
             Response.Write("<script>alert('Something went wrong. Please try again later.');</script>");
         }
     }
+    protected void btnHostAssign_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            var btn = sender as Button;
+            if (btn == null) return;
 
+            var item = btn.NamingContainer as RepeaterItem;
+            if (item == null) return;
+
+            // 🔹 Controls
+            var ddlUser = item.FindControl("ddlHostAssignUser") as DropDownList;
+            var ddlRam = item.FindControl("ddlHostRam") as DropDownList;
+            var qtyField = item.FindControl("hdnHostQty") as HiddenField;
+            var pidField = item.FindControl("hdnHostPID") as HiddenField;
+            var lblPrice = item.FindControl("lblPrice") as HtmlGenericControl;
+            var lblItemName = item.FindControl("lblIN") as HtmlGenericControl;
+
+            if (ddlUser == null || ddlUser.SelectedItem == null)
+                return;
+
+            // 🔹 Values
+            string ip = btn.CommandArgument ?? "";
+            string email = ddlUser.SelectedItem.Text;
+
+            string selectedRam = ddlRam?.SelectedValue ?? "4";
+            string pid = pidField?.Value ?? "";
+            int qty = int.TryParse(qtyField?.Value, out int q) ? q : 1;
+
+            // 🔹 Price
+            decimal unitPrice = 0m;
+            if (lblPrice != null)
+            {
+                var cleanPrice = lblPrice.InnerText.Replace("₹", "").Trim();
+                decimal.TryParse(cleanPrice,
+                    System.Globalization.NumberStyles.Any,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    out unitPrice);
+            }
+
+            decimal totalAmount = unitPrice * qty;
+
+            // 🔹 Transaction
+            string txnId = $"TXN{DateTime.Now:yyyyMMddHHmmss}";
+
+            // 🔹 Session
+            Session["txnId"] = txnId;
+            Session["Assign"] = true;
+            Session["SelectedPlanId"] = pid;
+            Session["RAM"] = selectedRam;
+            Session["SelectedIpv4"] = ip;
+            Session["SelectedHostItem"] = lblItemName?.InnerText ?? "";
+            Session["Host"] = "Yes";
+
+            // 🔹 DB Call
+            DAL dal = new DAL();
+            DataTable dt = dal.GetUserByEmail(email);
+
+            if (dt == null || dt.Rows.Count == 0)
+            {
+                ShowAlert("User not found.");
+                return;
+            }
+
+            // ✅ Extract DataRow
+            DataRow row = dt.Rows[0];
+
+            string name = row["FullName"]?.ToString() ?? "";
+            string AssigneeUserID = row["UserID"]?.ToString() ?? "";
+            string mobile = "9132678956";
+
+            // 🔹 Prepare Response
+            var response = new PaymentGatewayHelper.CreateOrderResponse
+            {
+                status = true,
+                msg = $"Assigning the HostDzire Server: {ip}",
+                data = new PaymentGatewayHelper.OrderData
+                {
+                    payment_url = "~/Pages/payment_detail.aspx"
+                }
+            };
+
+            // 🔹 Save Order
+            dal.SaveOrder(
+                response,
+                txnId,
+                totalAmount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture),
+                name,
+                email,
+                mobile
+            );
+
+            // 🔹 Redirect
+            Response.Redirect(response.data.payment_url, false);
+            Context.ApplicationInstance.CompleteRequest();
+        }
+        catch (Exception ex)
+        {
+            ShowAlert("Something went wrong. Please try again later.");
+        }
+    }
+    private void ShowAlert(string message)
+    {
+        Response.Write($"<script>alert('{message}');</script>");
+    }
     // ---------------------------
     // Pay0.shop API Integration
     // ---------------------------
@@ -364,55 +550,7 @@ public partial class Portal_IpStock : System.Web.UI.Page
         }
     }
 
-    // Optional: Method to check order status
-    private async Task<dynamic> CheckPay0OrderStatusAsync(string orderId)
-    {
-        try
-        {
-            // IMPORTANT: Replace with your actual Pay0.shop API key
-            string userToken = "7598222e12176d08fa7164d2b5f24136"; // You need to set your actual API key
-
-            using (var httpClient = new HttpClient())
-            {
-                var postData = new Dictionary<string, string>
-                {
-                    { "user_token", userToken },
-                    { "order_id", orderId }
-                };
-
-                var content = new FormUrlEncodedContent(postData);
-                
-                var response = await httpClient.PostAsync("https://pay0.shop/api/check-order-status", content);
-                var responseString = await response.Content.ReadAsStringAsync();
-                
-                if (response.IsSuccessStatusCode)
-                {
-                    dynamic jsonResponse = Newtonsoft.Json.JsonConvert.DeserializeObject(responseString);
-                    
-                    return new 
-                    {
-                        status = jsonResponse.status,
-                        message = jsonResponse.message,
-                        txnStatus = jsonResponse.result?.txnStatus,
-                        orderId = jsonResponse.result?.orderId,
-                        amount = jsonResponse.result?.amount,
-                        date = jsonResponse.result?.date,
-                        utr = jsonResponse.result?.utr
-                    };
-                }
-                else
-                {
-                    return new { status = false, message = "API call failed" };
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            return new { status = false, message = $"Exception: {ex.Message}" };
-        }
-    }
-
-
+    
     // ---------------------------
     // IP stock methods (cached)
     // ---------------------------
@@ -539,9 +677,7 @@ public partial class Portal_IpStock : System.Web.UI.Page
                 {
                     $"{plan.ipv4} IPv4 addresses",
                     $"{plan.ram} GB RAM",
-                    $"Status: {plan.status}",
-                    "Full root access",
-                    "DDoS Protection"
+                    $"Status: {plan.status}"
                 })
             };
         }).ToList();
@@ -654,6 +790,7 @@ public partial class Portal_IpStock : System.Web.UI.Page
 
             // Store in Session for later use
             Session["txnId"] = txnId;
+            Session["Assign"] = false;
             Session["SelectedPlanId"] = planId;
             Session["SelectedRam"] = ramSelected;
             Session["SelectedIpv4"] = ipv4Count;
@@ -712,6 +849,87 @@ public partial class Portal_IpStock : System.Web.UI.Page
             {
                 // handle failure (show message, log, etc.)
                 Response.Write("<script>alert('Order creation failed. Please try again later.');</script>");
+            }
+        }
+        else if (e.CommandName == "Assign")
+        {
+            try
+            {
+                if (!IsAdmin())
+                {
+                    ShowAlert("You do not have permission to assign servers.");
+                    return;
+                }
+                // 🔹 Controls
+                var ddlAssignUser = (DropDownList)e.Item.FindControl("ddlAssignUser");
+                var ddlRam = (DropDownList)e.Item.FindControl("ddlRamPerPlan");
+                var hdnPlanId = (HiddenField)e.Item.FindControl("hdnPlanId");
+                var hdnIpv4 = (HiddenField)e.Item.FindControl("hdnIpv4");
+                // 🔹 Validation
+                if (ddlAssignUser == null || string.IsNullOrEmpty(ddlAssignUser.SelectedValue))
+                {
+                    ShowAlert("Please select a user to assign the server to.");
+                    return;
+                }
+                // 🔹 Values
+                string selectedUserId = ddlAssignUser.SelectedValue;
+                string email = ddlAssignUser.SelectedItem.Text; // Email from dropdown
+                string planId = hdnPlanId?.Value ?? "0";
+                string ramSelected = ddlRam?.SelectedValue ?? "4";
+                string ipv4Count = hdnIpv4?.Value ?? "0";
+                string txnId = "TXN" + DateTime.Now.ToString("yyyyMMddHHmmss");
+                // 🔹 Session
+                Session["txnId"] = txnId;
+                Session["Assign"] = true;
+                Session["SelectedPlanId"] = planId;
+                Session["SelectedRam"] = ramSelected;
+                Session["SelectedIpv4"] = ipv4Count;
+                Session["Host"] = "No";
+                Session["AssignedUserId"] = selectedUserId;
+                // 🔹 Get User Data from DB
+                DAL dal = new DAL();
+                DataTable dt = dal.GetUserByEmail(email);
+                if (dt == null || dt.Rows.Count == 0)
+                {
+                    ShowAlert("User not found.");
+                    return;
+                }
+
+                // ✅ Extract user data ONCE
+                DataRow row = dt.Rows[0];
+                string name = row["FullName"]?.ToString() ?? "";
+                string AssigneeUserID = row["UserID"]?.ToString() ?? "";
+                string mobile = "9132678956";
+
+                // 🔹 Create Assignment Order
+                var orderResponse = new PaymentGatewayHelper.CreateOrderResponse
+                {
+                    status = true,
+                    msg = "Ocean Linux Server Assignment by Admin",
+                    data = new PaymentGatewayHelper.OrderData
+                    {
+                        payment_url = "~/Pages/payment_detail.aspx?client_txn_id=" + txnId,
+                        order_id = 0
+                    }
+                };
+
+                // 🔹 Save Order (FIXED: using correct user data)
+                dal.SaveOrder(
+                    orderResponse,
+                    txnId,
+                    "0",
+                    name,     // ✅ correct
+                    email,    // ✅ correct
+                    mobile    // ✅ FIXED (was hardcoded before)
+                );
+
+                // 🔹 Redirect
+                Response.Redirect("~/Pages/payment_detail.aspx", false);
+                Context.ApplicationInstance.CompleteRequest();
+            }
+            catch (Exception ex)
+            {
+                ShowAlert("Error assigning server: " + ex.Message);
             }
         }
     }
@@ -912,6 +1130,35 @@ public partial class Portal_IpStock : System.Web.UI.Page
         // Also set hidden fields if present
         if (hdnPlanId != null) hdnPlanId.Value = (plan.Id ?? 0).ToString();
         if (hdnIpv4 != null) hdnIpv4.Value = (plan.Ipv4 ?? 0).ToString();
+
+        // Show admin assignment controls if user is admin
+        var phAdminAssign = (PlaceHolder)e.Item.FindControl("phAdminAssign");
+        var ddlAssignUser = (DropDownList)e.Item.FindControl("ddlAssignUser");
+        
+        if (phAdminAssign != null && ddlAssignUser != null)
+        {
+            if (IsAdmin())
+            {
+                phAdminAssign.Visible = true;
+                
+                // Bind users to dropdown
+                var users = ViewState["AllUsers"] as System.Data.DataTable;
+                if (users != null && users.Rows.Count > 0)
+                {
+                    ddlAssignUser.DataSource = users;
+                    ddlAssignUser.DataTextField = "Email";
+                    ddlAssignUser.DataValueField = "UserID";
+                    ddlAssignUser.DataBind();
+                    
+                    // Add default option
+                    ddlAssignUser.Items.Insert(0, new ListItem("Select User", ""));
+                }
+            }
+            else
+            {
+                phAdminAssign.Visible = false;
+            }
+        }
     }
 
 

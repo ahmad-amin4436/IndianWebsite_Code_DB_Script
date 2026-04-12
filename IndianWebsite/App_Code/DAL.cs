@@ -317,4 +317,73 @@ public class DAL
         }
         return dt;
     }
+
+    public bool AssignServerToUser(int planId, int userId, string ram, string ipv4, string txnId, string assignedBy)
+    {
+        try
+        {
+            using (SqlConnection con = new SqlConnection(cs))
+            {
+                string query = @"INSERT INTO ServerAssignments 
+                                (PlanId, UserId, RAM, IPv4, TransactionId, AssignedBy, AssignedDate)
+                                VALUES (@PlanId, @UserId, @RAM, @IPv4, @TransactionId, @AssignedBy, GETDATE())";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@PlanId", planId);
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    cmd.Parameters.AddWithValue("@RAM", ram);
+                    cmd.Parameters.AddWithValue("@IPv4", ipv4);
+                    cmd.Parameters.AddWithValue("@TransactionId", txnId);
+                    cmd.Parameters.AddWithValue("@AssignedBy", assignedBy);
+
+                    con.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    con.Close();
+
+                    return rowsAffected > 0;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log error if needed
+            return false;
+        }
+    }
+
+    public bool AssignHostServerToUser(string pid, int userId, string ram, string ip, string qty, string txnId, string assignedBy)
+    {
+        try
+        {
+            using (SqlConnection con = new SqlConnection(cs))
+            {
+                string query = @"INSERT INTO HostServerAssignments 
+                                (PID, UserId, RAM, IP, Quantity, TransactionId, AssignedBy, AssignedDate)
+                                VALUES (@PID, @UserId, @RAM, @IP, @Quantity, @TransactionId, @AssignedBy, GETDATE())";
+
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@PID", pid);
+                    cmd.Parameters.AddWithValue("@UserId", userId);
+                    cmd.Parameters.AddWithValue("@RAM", ram);
+                    cmd.Parameters.AddWithValue("@IP", ip);
+                    cmd.Parameters.AddWithValue("@Quantity", qty);
+                    cmd.Parameters.AddWithValue("@TransactionId", txnId);
+                    cmd.Parameters.AddWithValue("@AssignedBy", assignedBy);
+
+                    con.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    con.Close();
+
+                    return rowsAffected > 0;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log error if needed
+            return false;
+        }
+    }
 }

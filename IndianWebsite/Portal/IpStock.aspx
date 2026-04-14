@@ -211,7 +211,7 @@ Total Price
                                                 OnClick="btnHostBuyNow_Click"
                                                 CommandArgument='<%# Eval("IP") %>' />
                                             
-                                        <asp:Panel ID="pnlHostAdminAssign" runat="server" Visible="false">
+                                        <asp:Panel ID="phHostAdminAssign" runat="server" Visible="false">
                                             <asp:DropDownList ID="ddlHostAssignUser" runat="server" 
                                                 CssClass="form-select mb-2" 
                                                 DataTextField="Email" 

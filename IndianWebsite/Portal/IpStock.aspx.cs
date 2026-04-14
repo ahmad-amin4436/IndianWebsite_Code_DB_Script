@@ -423,7 +423,7 @@ public partial class Portal_IpStock : System.Web.UI.Page
                 string paymentUrl = orderResponse.payment_url?.ToString();
                 if (!string.IsNullOrEmpty(paymentUrl))
                 {
-                        SafeRedirect(paymentUrl);
+                    SafeRedirect(paymentUrl);
                     Context.ApplicationInstance.CompleteRequest(); // avoid ThreadAbortException
                     return;
                 }

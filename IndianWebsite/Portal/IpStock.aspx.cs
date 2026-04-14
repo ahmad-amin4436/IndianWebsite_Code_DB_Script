@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;                  // HttpRuntime.Cache
 using System.Web.Caching;         // Cache.NoSlidingExpiration
+using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
@@ -19,11 +20,22 @@ public partial class Portal_IpStock : System.Web.UI.Page
     private readonly string baseUrl = "https://smartvps.online/api/oceansmart";
     private readonly string authKey = "Basic U0NCSEFJOmZmZ2d2Y2hnNzg4Nw=="; // API Key (keep safe)
 
-    protected async void Page_Load(object sender, EventArgs e)
+    protected void Page_Load(object sender, EventArgs e)
     {
+        // Validate session early and redirect when missing
         if (Session["Email"] == null || Session["Password"] == null || Session["CustomerName"] == null)
         {
-            Response.Redirect("~/Default.aspx", false);
+            // If this is an async postback (UpdatePanel/AJAX), return a client script to redirect
+            var sm = System.Web.UI.ScriptManager.GetCurrent(this.Page);
+            if (sm != null && sm.IsInAsyncPostBack)
+            {
+                string url = ResolveUrl("~/Default.aspx");
+                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "redirect", "window.location='" + url + "';", true);
+                Context.ApplicationInstance.CompleteRequest();
+                return;
+            }
+
+                SafeRedirect("~/Default.aspx");
             Context.ApplicationInstance.CompleteRequest(); // prevent threadabortexception
             return;
         }
@@ -32,10 +44,54 @@ public partial class Portal_IpStock : System.Web.UI.Page
         {
             // Load users for admin assignment dropdown
             LoadUsersForAssignment();
-            
-            // Load HostDzire offers first (cached) then bind IP plans (also cached)
-            await BindHostDzireAsync();
-            await BindIpPlans();
+
+            // Use RegisterAsyncTask so the page executes async work safely inside ASP.NET lifecycle
+            try
+            {
+                Page.RegisterAsyncTask(new System.Web.UI.PageAsyncTask(async () =>
+                {
+                    try
+                    {
+                        await BindHostDzireAsync();
+                        await BindIpPlans();
+                    }
+                    catch (Exception exInner)
+                    {
+                        // Don't allow exceptions to bubble out as 500 to UpdatePanel/AJAX callers.
+                        // Write a friendly message to the page and optionally log the error.
+                        Response.Write("<div class='alert alert-danger'>An error occurred while loading offers. Please try again later.</div>");
+                        // Consider logging exInner to your logging system here.
+                    }
+                }));
+            }
+            catch (Exception ex)
+            {
+                // Fallback: if registering async task fails, write message but do not throw
+                Response.Write("<div class='alert alert-danger'>Unable to start data loader. Please reload the page.</div>");
+            }
+        }
+    }
+
+    // Helper: perform a redirect safely during normal and async postbacks
+    private void SafeRedirect(string url)
+    {
+        try
+        {
+            var sm = System.Web.UI.ScriptManager.GetCurrent(this.Page);
+            if (sm != null && sm.IsInAsyncPostBack)
+            {
+                string resolved = ResolveUrl(url);
+                ScriptManager.RegisterStartupScript(this.Page, this.Page.GetType(), "safeRedirect", "window.location='" + resolved + "';", true);
+                Context.ApplicationInstance.CompleteRequest();
+                return;
+            }
+
+            Response.Redirect(url, false);
+            Context.ApplicationInstance.CompleteRequest();
+        }
+        catch
+        {
+            // swallow to avoid throwing during postback; worst-case user will remain on page
         }
     }
 
@@ -125,8 +181,8 @@ public partial class Portal_IpStock : System.Web.UI.Page
 
         var result = new List<HostOffer>();
 
-        try
-        {
+    try
+    {
             // 🔹 Build form data for HostDzire API
             var formFields = new List<KeyValuePair<string, string>>
         {
@@ -139,11 +195,14 @@ public partial class Portal_IpStock : System.Web.UI.Page
             {
                 req.Content = content;
 
-                var resp = await _httpClient.SendAsync(req).ConfigureAwait(false);
+                var resp = await _httpClient.SendAsync(req);
                 if (!resp.IsSuccessStatusCode)
+                {
+                    // return empty list if remote service is down or returns error
                     return result;
+                }
 
-                var json = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var json = await resp.Content.ReadAsStringAsync();
                 var root = JObject.Parse(json);
                 var data = root["data"] as JObject;
                 if (data == null) return result;
@@ -194,7 +253,7 @@ public partial class Portal_IpStock : System.Web.UI.Page
         }
         catch
         {
-            // Ignore network or parsing errors
+            // Ignore network or parsing errors but ensure we return an empty list
         }
 
         // 🔹 Cache for 5 minutes
@@ -254,7 +313,7 @@ public partial class Portal_IpStock : System.Web.UI.Page
         if (hdnVps != null) hdnVps.Value = vpsTier.ToString();
 
         // Show admin assignment controls if user is admin
-        var phHostAdminAssign = (PlaceHolder)e.Item.FindControl("phHostAdminAssign");
+        var phHostAdminAssign = (Panel)e.Item.FindControl("phHostAdminAssign");
         var ddlHostAssignUser = (DropDownList)e.Item.FindControl("ddlHostAssignUser");
         
         if (phHostAdminAssign != null && ddlHostAssignUser != null)
@@ -364,7 +423,7 @@ public partial class Portal_IpStock : System.Web.UI.Page
                 string paymentUrl = orderResponse.payment_url?.ToString();
                 if (!string.IsNullOrEmpty(paymentUrl))
                 {
-                    Response.Redirect(paymentUrl);
+                        SafeRedirect(paymentUrl);
                     Context.ApplicationInstance.CompleteRequest(); // avoid ThreadAbortException
                     return;
                 }
@@ -477,7 +536,7 @@ public partial class Portal_IpStock : System.Web.UI.Page
             );
 
             // 🔹 Redirect
-            Response.Redirect(response.data.payment_url, false);
+                SafeRedirect(response.data.payment_url);
             Context.ApplicationInstance.CompleteRequest();
         }
         catch (Exception ex)
@@ -588,44 +647,60 @@ public partial class Portal_IpStock : System.Web.UI.Page
         if (HttpRuntime.Cache[cacheKey] != null)
             return (List<Package>)HttpRuntime.Cache[cacheKey];
 
-        using (var request = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/ipstock"))
+        try
         {
-            request.Headers.Clear();
-            request.Headers.Add("Authorization", authKey);
-
-            var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
-
-            var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            if (json.StartsWith("\"") && json.EndsWith("\""))
+            using (var request = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/ipstock"))
             {
-                json = JsonConvert.DeserializeObject<string>(json);
-            }
+                request.Headers.Clear();
+                request.Headers.Add("Authorization", authKey);
 
-            var result = JsonConvert.DeserializeObject<ApiResponse>(json);
-
-            if (result?.status == 1 && result.packages != null)
-            {
-                var packages = result.packages
-                                     .Where(p => p.status == "active" && p.ipv4 > 0)
-                                     .OrderByDescending(p => p.ipv4)
-                                     .ToList();
-
-                // Assign RAM based on rules
-                foreach (var p in packages)
+                var response = await _httpClient.SendAsync(request);
+                if (!response.IsSuccessStatusCode)
                 {
-                    if (p.ipv4 < 200) p.ram = 4;         // Linux
-                    else if (p.ipv4 >= 200 && p.ipv4 < 400) p.ram = 8;
-                    else if (p.ipv4 >= 400 && p.ipv4 < 800) p.ram = 16;
-                    else p.ram = 32;
+                    // Remote service returned an error; return empty list instead of throwing
+                    return new List<Package>();
                 }
 
-                // cache results
-                HttpRuntime.Cache.Insert(cacheKey, packages, null, DateTime.UtcNow.AddMinutes(5), System.Web.Caching.Cache.NoSlidingExpiration);
+                var json = await response.Content.ReadAsStringAsync();
 
-                return packages;
+                if (string.IsNullOrWhiteSpace(json))
+                    return new List<Package>();
+
+                if (json.StartsWith("\"") && json.EndsWith("\""))
+                {
+                    try { json = JsonConvert.DeserializeObject<string>(json); } catch { }
+                }
+
+                ApiResponse result = null;
+                try { result = JsonConvert.DeserializeObject<ApiResponse>(json); } catch { result = null; }
+
+                if (result?.status == 1 && result.packages != null)
+                {
+                    var packages = result.packages
+                                         .Where(p => p.status == "active" && p.ipv4 > 0)
+                                         .OrderByDescending(p => p.ipv4)
+                                         .ToList();
+
+                    // Assign RAM based on rules
+                    foreach (var p in packages)
+                    {
+                        if (p.ipv4 < 200) p.ram = 4;         // Linux
+                        else if (p.ipv4 >= 200 && p.ipv4 < 400) p.ram = 8;
+                        else if (p.ipv4 >= 400 && p.ipv4 < 800) p.ram = 16;
+                        else p.ram = 32;
+                    }
+
+                    // cache results
+                    HttpRuntime.Cache.Insert(cacheKey, packages, null, DateTime.UtcNow.AddMinutes(5), System.Web.Caching.Cache.NoSlidingExpiration);
+
+                    return packages;
+                }
             }
+        }
+        catch
+        {
+            // Any exception during the fetch or parse should not bubble up to the ASP.NET runtime
+            // Return empty list so page can render gracefully
         }
 
         return new List<Package>();
@@ -836,8 +911,7 @@ public partial class Portal_IpStock : System.Web.UI.Page
                 if (!string.IsNullOrEmpty(paymentUrl))
                 {
                     // Redirect user to payment URL
-                    Response.Redirect(paymentUrl);
-                    Context.ApplicationInstance.CompleteRequest(); // prevent ThreadAbortException
+                    SafeRedirect(paymentUrl);
                     return;
                 }
                 else
@@ -924,8 +998,7 @@ public partial class Portal_IpStock : System.Web.UI.Page
                 );
 
                 // 🔹 Redirect
-                Response.Redirect("~/Pages/payment_detail.aspx", false);
-                Context.ApplicationInstance.CompleteRequest();
+                SafeRedirect("~/Pages/payment_detail.aspx");
             }
             catch (Exception ex)
             {
@@ -1132,7 +1205,7 @@ public partial class Portal_IpStock : System.Web.UI.Page
         if (hdnIpv4 != null) hdnIpv4.Value = (plan.Ipv4 ?? 0).ToString();
 
         // Show admin assignment controls if user is admin
-        var phAdminAssign = (PlaceHolder)e.Item.FindControl("phAdminAssign");
+        var phAdminAssign = (Panel)e.Item.FindControl("phAdminAssign");
         var ddlAssignUser = (DropDownList)e.Item.FindControl("ddlAssignUser");
         
         if (phAdminAssign != null && ddlAssignUser != null)

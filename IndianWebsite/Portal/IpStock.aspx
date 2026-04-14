@@ -105,7 +105,7 @@
                                                 CommandName="BuyNow"
                                                 CommandArgument='<%# Eval("Id") %>' />
                                             
-                                            <asp:PlaceHolder ID="phAdminAssign" runat="server" Visible="false">
+                                            <asp:Panel ID="phAdminAssign" runat="server" Visible="false">
                                                 <asp:DropDownList ID="ddlAssignUser" runat="server" 
                                                     CssClass="form-select mb-2" 
                                                     DataTextField="Email" 
@@ -116,7 +116,7 @@
                                                     CssClass="btn btn-warning"
                                                     CommandName="Assign"
                                                     CommandArgument='<%# Eval("Id") %>' />
-                                            </asp:PlaceHolder>
+                                            </asp:Panel>
                                         </div>
                                     </div>
                                 </div>
@@ -211,18 +211,19 @@ Total Price
                                                 OnClick="btnHostBuyNow_Click"
                                                 CommandArgument='<%# Eval("IP") %>' />
                                             
-                                            <asp:PlaceHolder ID="phHostAdminAssign" runat="server" Visible="false">
-                                                <asp:DropDownList ID="ddlHostAssignUser" runat="server" 
-                                                    CssClass="form-select mb-2" 
-                                                    DataTextField="Email" 
-                                                    DataValueField="UserID">
-                                                </asp:DropDownList>
-                                                <asp:Button ID="btnHostAssign" runat="server"
-                                                    Text="Assign"
-                                                    CssClass="btn btn-warning"
-                                                    OnClick="btnHostAssign_Click"
-                                                    CommandArgument='<%# Eval("IP") %>' />
-                                            </asp:PlaceHolder>
+                                        <asp:Panel ID="pnlHostAdminAssign" runat="server" Visible="false">
+                                            <asp:DropDownList ID="ddlHostAssignUser" runat="server" 
+                                                CssClass="form-select mb-2" 
+                                                DataTextField="Email" 
+                                                DataValueField="UserID">
+                                            </asp:DropDownList>
+
+                                            <asp:Button ID="btnHostAssign" runat="server"
+                                                Text="Assign"
+                                                CssClass="btn btn-warning"
+                                                OnClick="btnHostAssign_Click"
+                                                CommandArgument='<%# Eval("IP") %>' />
+                                        </asp:Panel>
                                         </div>
                                     </div>
                                 </div>

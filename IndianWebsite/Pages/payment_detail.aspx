@@ -105,6 +105,10 @@
                                 <strong>Date:</strong>
                                 <asp:Label ID="lblDate" runat="server" CssClass="text-light ms-2"></asp:Label>
                             </div>
+                            <div class="mb-3">
+                                <strong>Selected IP:</strong>
+                                <asp:Label ID="lblSelectedIP" runat="server" CssClass="text-primary ms-2 fw-bold"></asp:Label>
+                            </div>
                         </asp:Panel>
 
                         <asp:Panel ID="pnlNoRecord" runat="server" Visible="false" CssClass="alert alert-transparent mt-3">

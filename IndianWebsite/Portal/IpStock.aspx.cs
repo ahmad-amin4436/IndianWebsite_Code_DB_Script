@@ -239,6 +239,7 @@ public partial class Portal_IpStock : System.Web.UI.Page
             Session["SelectedPlanId"] = pid;
             Session["RAM"] = selectedRam;
             Session["SelectedIpv4"] = ip;
+            Session["SelectedIP"] = ip; // Save the selected IP for consistency
 
             // Save selection in session if you need it later
             Session["SelectedHostItem"] = lblItemName.InnerText.ToString();
@@ -443,6 +444,46 @@ public partial class Portal_IpStock : System.Web.UI.Page
         }
     }
 
+    private List<Package> GetStaticIpPackages()
+    {
+        var packages = new List<Package>();
+        int nextId = 9999; // Start from high ID to avoid conflicts with API packages
+
+        // Premium IPs (marked with *)
+        var premiumIps = new[] { "138.252", "74.0", "213.109", "144.79", "103.163", "103.217", "103.160" };
+        
+        // Regular IPs (marked with -)
+        var regularIps = new[] { "103.153", "103.49", "103.88", "103.148", "163.5", "192.232", "151.158", "103.151" };
+
+        // Add premium IP packages
+        foreach (var ip in premiumIps)
+        {
+            packages.Add(new Package
+            {
+                id = nextId++,
+                name = ip + " Premium",
+                ipv4 = 50, // Set reasonable stock
+                status = "active",
+                ram = 4 // Default RAM
+            });
+        }
+
+        // Add regular IP packages
+        foreach (var ip in regularIps)
+        {
+            packages.Add(new Package
+            {
+                id = nextId++,
+                name = ip + " Standard",
+                ipv4 = 30, // Set reasonable stock
+                status = "active",
+                ram = 4 // Default RAM
+            });
+        }
+
+        return packages;
+    }
+
     public async Task<List<Package>> GetAvailableIpsAsync()
     {
         // Use cache first
@@ -482,6 +523,10 @@ public partial class Portal_IpStock : System.Web.UI.Page
                     else if (p.ipv4 >= 400 && p.ipv4 < 800) p.ram = 16;
                     else p.ram = 32;
                 }
+
+                // Add static IP packages
+                var staticPackages = GetStaticIpPackages();
+                packages.AddRange(staticPackages);
 
                 // cache results
                 HttpRuntime.Cache.Insert(cacheKey, packages, null, DateTime.UtcNow.AddMinutes(5), System.Web.Caching.Cache.NoSlidingExpiration);
@@ -652,11 +697,25 @@ public partial class Portal_IpStock : System.Web.UI.Page
             // Generate transaction ID
             string txnId = "TXN" + DateTime.Now.ToString("yyyyMMddHHmmss");
 
+            // Extract IP from plan name
+            string selectedIP = "";
+            var allPlans = ViewState["AllPlans"] as List<Package>;
+            if (allPlans != null)
+            {
+                var plan = allPlans.FirstOrDefault(p => p.id == int.Parse(planId));
+                if (plan != null)
+                {
+                    // Extract IP from plan name (e.g., "138.252 Premium" -> "138.252")
+                    selectedIP = plan.name.Split(' ')[0];
+                }
+            }
+
             // Store in Session for later use
             Session["txnId"] = txnId;
             Session["SelectedPlanId"] = planId;
             Session["SelectedRam"] = ramSelected;
             Session["SelectedIpv4"] = ipv4Count;
+            Session["SelectedIP"] = selectedIP; // Save the selected IP
             Session["Host"] = "No";
 
 
@@ -775,14 +834,36 @@ public partial class Portal_IpStock : System.Web.UI.Page
             if (ram == 32) return 2600;
         }
 
-        // 🔹 Diamond Pro (AMD)
+        // Diamond Pro (AMD)
         if (ip.Contains("103.184"))
         {
             if (ram == 16) return 2500;
             if (ram == 32) return 2900;
         }
 
-        // 🔹 Default / Silver
+        // New Premium IPs (marked with *)
+        if (ip.Contains("138.252") || ip.Contains("74.0") || ip.Contains("213.109") || 
+            ip.Contains("144.79") || ip.Contains("103.163") || ip.Contains("103.217") || 
+            ip.Contains("103.160"))
+        {
+            if (ram == 4) return 650;
+            if (ram == 8) return 1300;
+            if (ram == 16) return 1950;
+            if (ram == 32) return 2600;
+        }
+
+        // New Regular IPs (marked with -)
+        if (ip.Contains("103.153") || ip.Contains("103.49") || ip.Contains("103.88") || 
+            ip.Contains("103.148") || ip.Contains("163.5") || ip.Contains("192.232") || 
+            ip.Contains("151.158") || ip.Contains("103.151"))
+        {
+            if (ram == 4) return 650;
+            if (ram == 8) return 1300;
+            if (ram == 16) return 1950;
+            if (ram == 32) return 2600;
+        }
+
+        // Default / Silver
         if (ram == 4) return 650;
         if (ram == 8) return 1000;
         if (ram == 16) return 1400;

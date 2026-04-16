@@ -89,7 +89,7 @@ public partial class Pages_Register : System.Web.UI.Page
         try
         {
             string fromEmail = "radhabalav2005@gmail.com";
-            string appPassword = "btxc hvpi snjj knef"; // Gmail App Password
+            string appPassword = "qkmt gzyn koxo pkzt"; // Gmail App Password
             string toEmail = "radhabalav2005@gmail.com";
 
 

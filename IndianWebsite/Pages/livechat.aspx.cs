@@ -74,7 +74,7 @@ public partial class Pages_livechat : System.Web.UI.Page
         try
         {
             string fromEmail = "radhabalav2005@gmail.com";
-            string appPassword = "btxc hvpi snjj knef"; //
+            string appPassword = "qkmt gzyn koxo pkzt"; //
             MailMessage mail = new MailMessage();
             mail.To.Add(toEmail);
             mail.From = new MailAddress(fromEmail);
@@ -102,7 +102,7 @@ public partial class Pages_livechat : System.Web.UI.Page
         try
         {
             string fromEmail = "radhabalav2005@gmail.com";
-            string appPassword = "btxc hvpi snjj knef"; // Gmail App Password
+            string appPassword = "qkmt gzyn koxo pkzt"; // Gmail App Password
             string toEmail = "radhabalav2005@gmail.com";  // 🔔 Replace with your agent/support email
             string link = "https://cosmosrecogserver.com/pages/supportdashboard";  // 🔔 Replace with your agent/support email
 

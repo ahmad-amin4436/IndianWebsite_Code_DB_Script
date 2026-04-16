@@ -16,8 +16,25 @@ public partial class Pages_payment_detail : Page
     private readonly string baseUrl = "https://smartvps.online/api/oceansmart";
     private readonly string authKey = "Basic U0NCSEFJOmZmZ2d2Y2hnNzg4Nw=="; // Auth Key
 
+    private bool IsStaticIP(string ip)
+    {
+        if (string.IsNullOrEmpty(ip)) return false;
+        
+        // Premium IPs (marked with *)
+        var premiumIps = new[] { "138.252", "74.0", "213.109", "144.79", "103.163", "103.217", "103.160" };
+        
+        // Regular IPs (marked with -)
+        var regularIps = new[] { "103.153", "103.49", "103.88", "103.148", "163.5", "192.232", "151.158", "103.151" };
+
+        return premiumIps.Contains(ip) || regularIps.Contains(ip);
+    }
+
     protected async void Page_Load(object sender, EventArgs e)
     {
+        // Always display selected IP from session regardless of outcome
+        string selectedIP = Session["SelectedIP"]?.ToString() ?? "N/A";
+        lblSelectedIP.Text = selectedIP;
+        
         if (!IsPostBack)
         {
             string txnId = Request.QueryString["client_txn_id"];
@@ -36,7 +53,7 @@ public partial class Pages_payment_detail : Page
                         return;
                     }
 
-                    // 🔍 Get txn status
+                    // Get txn status
                     string txnStatus = result.txnStatus?.ToString()?.ToUpper();
 
                     if (string.IsNullOrEmpty(txnStatus))
@@ -46,7 +63,13 @@ public partial class Pages_payment_detail : Page
                         return;
                     }
 
-                    // 🟢 CASE 2: SUCCESS
+                    // Store transaction status in session for later use
+                    Session["TransactionStatus"] = txnStatus;
+                    Session["TransactionOrderId"] = result.orderId?.ToString() ?? "";
+                    Session["TransactionAmount"] = result.amount?.ToString() ?? "";
+                    Session["TransactionUTR"] = result.utr?.ToString() ?? "";
+
+                    // CASE 2: SUCCESS
                     if (txnStatus == "SUCCESS")
                     {
                         string orderId = result.orderId?.ToString();
@@ -54,12 +77,12 @@ public partial class Pages_payment_detail : Page
                         string utr = result.utr?.ToString();
                     }
 
-                    // 🟡 CASE 3: PENDING
+                    // CASE 3: PENDING
                     if (txnStatus == "PENDING")
                     {
-                        Response.Redirect("~/Default.aspx", false);  // false = don't abort thread
-                        Context.ApplicationInstance.CompleteRequest();
-                        return;
+                        //Response.Redirect("~/Default.aspx", false);  // false = don't abort thread
+                        //Context.ApplicationInstance.CompleteRequest();
+                        //return;
                     }
                 }
             }
@@ -140,8 +163,7 @@ public partial class Pages_payment_detail : Page
         {
             DAL dal = new DAL();
 
-            // 1️⃣ Update Payment Status in DB
-            dal.UpdatePaymentStatus(txnId);
+            
 
             // 2️⃣ Get Payment Order
             var row = dal.GetPaymentOrder(txnId);
@@ -154,19 +176,32 @@ public partial class Pages_payment_detail : Page
             // 3️⃣ Populate UI
             DisplayTransactionDetails(row);
 
+            string selectedIP = Session["SelectedIP"]?.ToString() ?? "";
             string itemID = Session["SelectedHostItem"]?.ToString();
             string host = Session["Host"]?.ToString();
 
             if (string.IsNullOrEmpty(itemID) || string.IsNullOrEmpty(host))
             {
-                lblVpsStatus.Text = "❌ Missing session details for VPS order.";
+                lblVpsStatus.Text = "Missing session details for VPS order.";
                // return;
             }
-
-            if (host == "Yes")
-                await HandleHostDzireOrderAsync(itemID);
-            else
-                await HandleOceanSmartOrderAsync(itemID);
+            // Check if this is a static IP order
+            if (IsStaticIP(selectedIP))
+            {
+                await HandleStaticIPOrderAsync(selectedIP);
+            }
+            if (Session["TransactionStatus"].ToString() == "SUCCESS")
+            {// 1️⃣ Update Payment Status in DB
+                dal.UpdatePaymentStatus(txnId);
+                if (host == "Yes")
+                {
+                    await HandleHostDzireOrderAsync(itemID);
+                }
+                else
+                {
+                    await HandleOceanSmartOrderAsync(itemID);
+                }
+            }
             
         }
         catch (Exception ex)
@@ -181,9 +216,45 @@ public partial class Pages_payment_detail : Page
         lblCustomer.Text = row["CustomerName"].ToString();
         lblEmail.Text = row["CustomerEmail"].ToString();
         lblMobile.Text = row["CustomerMobile"].ToString();
-        lblAmount.Text = "₹ " + row["Amount"];
-        lblStatus.Text = Convert.ToBoolean(row["PaymentStatus"]) ? "Success" : "Failed";
+        lblAmount.Text = "₹ " + Session["TransactionAmount"].ToString();
+        
+        // Use transaction status from API response if available, otherwise use database status
+        string apiTransactionStatus = Session["TransactionStatus"]?.ToString()?.ToUpper();
+        if (!string.IsNullOrEmpty(apiTransactionStatus))
+        {
+            // Use API status with proper formatting
+            switch (apiTransactionStatus)
+            {
+                case "SUCCESS":
+                    lblStatus.Text = "Success";
+                    lblStatus.CssClass = "text-success ms-2 fw-bold";
+                    break;
+                case "PENDING":
+                    lblStatus.Text = "Pending";
+                    lblStatus.CssClass = "text-warning ms-2 fw-bold";
+                    break;
+                case "FAILED":
+                    lblStatus.Text = "Failed";
+                    lblStatus.CssClass = "text-danger ms-2 fw-bold";
+                    break;
+                default:
+                    lblStatus.Text = apiTransactionStatus;
+                    lblStatus.CssClass = "text-primary ms-2 fw-bold";
+                    break;
+            }
+        }
+        else
+        {
+            // Fallback to database status
+            lblStatus.Text = Convert.ToBoolean(row["PaymentStatus"]) ? "Success" : "Failed";
+            lblStatus.CssClass = Convert.ToBoolean(row["PaymentStatus"]) ? "text-success ms-2 fw-bold" : "text-danger ms-2 fw-bold";
+        }
+        
         lblDate.Text = Convert.ToDateTime(row["CreatedAt"]).ToString("dd-MMM-yyyy hh:mm tt");
+        
+        // Display selected IP from session
+        string selectedIP = Session["SelectedIP"]?.ToString() ?? "N/A";
+        lblSelectedIP.Text = selectedIP;
 
         pnlTransaction.Visible = true;
         pnlNoRecord.Visible = false;
@@ -191,6 +262,10 @@ public partial class Pages_payment_detail : Page
 
     private void ShowNoRecord(string message)
     {
+        // Still display the selected IP even if no record found
+        string selectedIP = Session["SelectedIP"]?.ToString() ?? "N/A";
+        lblSelectedIP.Text = selectedIP;
+        
         pnlTransaction.Visible = false;
         pnlNoRecord.Visible = true;
     }
@@ -290,6 +365,69 @@ public partial class Pages_payment_detail : Page
         catch (Exception ex)
         {
             lblVpsStatus.Text = $"❌ Error placing HostDzire VPS: {ex.Message}";
+        }
+    }
+
+    private async Task HandleStaticIPOrderAsync(string selectedIP)
+    {
+        try
+        {
+            string ram = Session["RAM"]?.ToString() ?? "4";
+            string serverOS = ram == "4" ? "Ubuntu 22 64" : "Windows 2022 64";
+            
+            // Determine IP type for display
+            string ipType = IsStaticIP(selectedIP) ? 
+                (new[] { "138.252", "74.0", "213.109", "144.79", "103.163", "103.217", "103.160" }.Contains(selectedIP) ? "Premium" : "Standard") 
+                : "Regular";
+            
+            lblVpsStatus.Text = "Static IP order processed successfully.";
+            
+            // Save in database directly without API calls
+            DAL dal = new DAL();
+            dal.InsertVpsOrder(
+                lblClientTxnId.Text,
+                Session["UserID"] != null ? Convert.ToInt32(Session["UserID"]) : (int?)null,
+                selectedIP,              // Static IP
+                serverOS,
+                lblCustomer.Text,       // Username / Customer name
+                "Check Manage Order",   // Password placeholder
+                "Active",               // Action status
+                "Running",              // Machine status
+                "Running",              // Power status
+                ram,
+                DateTime.Now.AddMonths(1)
+            );
+            
+            // Display details on page
+            lblVpsDetails.Text = $@"
+            <b>Order Type:</b> Static IP Order<br/>
+            <b>IP:</b> {selectedIP} ({ipType})<br/>
+            <b>OS:</b> {serverOS}<br/>
+            <b>Username:</b> {lblCustomer.Text}<br/>
+            <b>RAM:</b> {ram} GB<br/>
+            <b>Status:</b> Active<br/>
+            <b>Note:</b> VPS details have been sent to your registered email.";
+            
+            // Send email to customer
+            SendVpsDetailsEmail(
+               lblCustomer.Text,         // customer name
+               lblEmail.Text,            // customer email
+               "Cosmos Recog Server",    // provider name
+               selectedIP,              // VPS IP
+               serverOS,                 // OS
+               lblCustomer.Text,         // username
+               "Check Manage Order",     // password
+               ram,                      // RAM
+               "Active",                 // VPS status
+               DateTime.Now.AddMonths(1).ToString("f") // expiry
+           );
+            
+            // Send notification email to admin
+            await SendStaticIPNotificationEmail(selectedIP, ipType, ram, lblCustomer.Text, lblEmail.Text);
+        }
+        catch (Exception ex)
+        {
+            lblVpsStatus.Text = $"Error processing static IP order: {ex.Message}";
         }
     }
 
@@ -429,7 +567,7 @@ public partial class Pages_payment_detail : Page
         try
         {
             string fromEmail = "radhabalav2005@gmail.com";
-            string appPassword = "btxc hvpi snjj knef";
+            string appPassword = "qkmt gzyn koxo pkzt";
             string sellerEmail = "radhabalav2005@gmail.com"; // seller/your team
 
             using (SmtpClient client = new SmtpClient("smtp.gmail.com", 587))
@@ -437,12 +575,13 @@ public partial class Pages_payment_detail : Page
                 client.EnableSsl = true;
                 client.DeliveryMethod = SmtpDeliveryMethod.Network;
                 client.UseDefaultCredentials = false;
+                client.Timeout = 30000; // 30 seconds timeout
                 client.Credentials = new NetworkCredential(fromEmail, appPassword);
 
                 MailMessage message = new MailMessage
                 {
                     From = new MailAddress(fromEmail, "COSMOSRECOG VPS Team"),
-                    Subject = $"✅ VPS Order Confirmation - {providerName}",
+                    Subject = $"VPS Order Confirmation - {providerName}",
                     Body = htmlBody,
                     IsBodyHtml = true
                 };
@@ -456,6 +595,74 @@ public partial class Pages_payment_detail : Page
         catch (Exception ex)
         {
            
+        }
+    }
+
+
+    private async Task SendStaticIPNotificationEmail(string selectedIP, string ipType, string ram, string customerName, string customerEmail)
+    {
+        string dateTime = DateTime.Now.ToString("f");
+
+        string htmlBody = $@"
+    <html>
+    <body style='font-family:Arial;background:#f4f4f4;padding:20px;'>
+      <div style='background:#fff;padding:20px;border-radius:10px;max-width:650px;margin:auto;'>
+        <h2 style='color:#e74c3c;'>Static IP Order Alert - <span style='color:#007bff;'>COSMOSRECOG</span></h2>
+        <p><strong>Admin Notification:</strong> A new static IP order has been processed without API calls.</p>
+        
+        <div style='background:#fef9e7;padding:15px;border-left:4px solid #f39c12;margin:15px 0;'>
+          <h4 style='color:#f39c12;margin-top:0;'>Order Details:</h4>
+          <table style='width:100%;border-collapse:collapse;'>
+            <tr><td style='padding:5px;'><strong>IP Address:</strong></td><td style='padding:5px;'>{selectedIP} ({ipType})</td></tr>
+            <tr><td style='padding:5px;'><strong>RAM:</strong></td><td style='padding:5px;'>{ram} GB</td></tr>
+            <tr><td style='padding:5px;'><strong>Customer:</strong></td><td style='padding:5px;'>{customerName}</td></tr>
+            <tr><td style='padding:5px;'><strong>Email:</strong></td><td style='padding:5px;'>{customerEmail}</td></tr>
+            <tr><td style='padding:5px;'><strong>Transaction ID:</strong></td><td style='padding:5px;'>{lblClientTxnId.Text}</td></tr>
+            <tr><td style='padding:5px;'><strong>Order Date:</strong></td><td style='padding:5px;'>{dateTime}</td></tr>
+          </table>
+        </div>
+        
+        <p style='margin-top:15px;'><strong>Note:</strong> This order was processed directly without external API calls as it uses a static IP address from the predefined list.</p>
+        
+        <div style='font-size:12px;color:#999;margin-top:20px;'>
+          This is an automated notification from COSMOSRECOG Hosting Solutions.<br/>
+          &copy; 2025 COSMOSRECOG
+        </div>
+      </div>
+    </body>
+    </html>";
+
+        try
+        {
+            string fromEmail = "radhabalav2005@gmail.com";
+            string appPassword = "qkmt gzyn koxo pkzt";
+            string adminEmail = "radhabalav2005@gmail.com";
+
+            using (SmtpClient client = new SmtpClient("smtp.gmail.com", 587))
+            {
+                client.EnableSsl = true;
+                client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                client.UseDefaultCredentials = false;
+                client.Timeout = 30000; // 30 seconds timeout
+                client.Credentials = new NetworkCredential(fromEmail, appPassword);
+
+                MailMessage message = new MailMessage
+                {
+                    From = new MailAddress(fromEmail, "COSMOSRECOG System"),
+                    Subject = $"Static IP Order Alert - {selectedIP} ({ipType})",
+                    Body = htmlBody,
+                    IsBodyHtml = true
+                };
+
+                message.To.Add(new MailAddress(adminEmail));
+
+                await Task.Run(() => client.Send(message));
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log error but don't show to customer
+            System.Diagnostics.Debug.WriteLine($"Failed to send static IP notification: {ex.Message}");
         }
     }
 

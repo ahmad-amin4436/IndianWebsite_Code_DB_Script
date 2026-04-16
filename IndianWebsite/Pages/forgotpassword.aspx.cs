@@ -91,7 +91,7 @@ public partial class Pages_forgotpassword : System.Web.UI.Page
         try
         {
             string fromEmail = "radhabalav2005@gmail.com";
-            string appPassword = "btxc hvpi snjj knef"; //
+            string appPassword = "qkmt gzyn koxo pkzt"; //
             MailMessage mail = new MailMessage();
             mail.To.Add(to);
             mail.From = new MailAddress(fromEmail);

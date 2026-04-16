@@ -73,6 +73,7 @@ public partial class Portal_ManageOrders : System.Web.UI.Page
                     CustomerName = row["CustomerName"].ToString();
                     Email = row["Email"].ToString();
                     btnAssignServer.Visible = true;  // 👈 Makes it visible
+                    btnAssignServerList.Visible = true;  // 👈 Makes it visible
 
                 }
                 StringContent content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");

@@ -50,11 +50,16 @@
                             <asp:HyperLink ID="btnAssignServer"
                                 runat="server"
                                 Visible="false"
-                                Text="Assign Server"
+                                Text="Assign Server Manually"
                                 NavigateUrl="~/Portal/assignserver.aspx"
-                                CssClass="btn btn-outline-primary btn-lg" />
+                                CssClass="btn btn-outline-primary" />
                                 
-
+                             <asp:HyperLink ID="btnAssignServerList"
+                                runat="server"
+                                Visible="false"
+                                Text="Assign Server Package"
+                                NavigateUrl="~/Portal/AssignVPS.aspx"
+                                CssClass="btn btn-outline-primary" />
 
                         </div>
                     </div>

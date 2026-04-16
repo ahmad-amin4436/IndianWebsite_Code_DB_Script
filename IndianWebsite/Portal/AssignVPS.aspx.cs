@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -11,7 +12,7 @@ using System.Web.Caching;         // Cache.NoSlidingExpiration
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
-public partial class Portal_IpStock : System.Web.UI.Page
+public partial class Portal_AssignVPS : System.Web.UI.Page
 {
     // Shared HttpClient (best practice)
     private static readonly HttpClient _httpClient = new HttpClient();
@@ -26,9 +27,20 @@ public partial class Portal_IpStock : System.Web.UI.Page
             Context.ApplicationInstance.CompleteRequest(); // prevent threadabortexception
             return;
         }
-
+        
         if (!IsPostBack)
         {
+            DAL dal = new DAL();
+            DataTable dt = dal.LoadUsers();
+
+            ddlUser.DataSource = dt;
+            ddlUser.DataTextField = "Email";   // what user sees
+            ddlUser.DataValueField = "UserID"; // actual value
+
+            ddlUser.DataBind();
+
+            // Optional: add default item
+            ddlUser.Items.Insert(0, new ListItem("-- Select User --", "0"));
             // Load HostDzire offers first (cached) then bind IP plans (also cached)
             await BindHostDzireAsync();
             await BindIpPlans();
@@ -245,60 +257,44 @@ public partial class Portal_IpStock : System.Web.UI.Page
             Session["Host"] = "Yes";
 
             // Customer info
-            string name = Session["CustomerName"]?.ToString() ?? "Guest";
-            string email = Session["Email"]?.ToString() ?? "guest@example.com";
+            string name = ddlUser.SelectedItem.Text;
+            string email = ddlUser.SelectedItem.Text;
             string mobile = Session["Mobile"]?.ToString() ?? "9132678956"; // fallback
 
-            string redirectUrl = "https://cosmosrecogserver.com/Pages/payment_detail";
+            
 
             DAL dal = new DAL();
 
-            // Create order using Pay0.shop API
-            var orderResponse = await CreatePay0OrderAsync(
-                mobile,
-                name,
-                unitPrice.ToString("F2", System.Globalization.CultureInfo.InvariantCulture),
-                txnId,
-                redirectUrl,
-                $"HostDzire {ip} (PID:{pid}) - {selectedRam}GB - Qty:{qty}"
-            );
-
-            if (orderResponse != null && orderResponse.status)
-            {
-                // Create a compatible response object for the existing SaveOrder method
-                var compatibleResponse = new PaymentGatewayHelper.CreateOrderResponse
+            // Create a compatible response object for the existing SaveOrder method
+            var compatibleResponse = new PaymentGatewayHelper.CreateOrderResponse
                 {
                     status = true,
-                    msg = orderResponse.message,
+                    msg = $"Host Dzire Server Assining: {ip} ",
                     data = new PaymentGatewayHelper.OrderData
                     {
-                        payment_url = orderResponse.payment_url?.ToString() ?? ""
+                        payment_url = "~/Pages/payment_detail.aspx"
                     }
                 };
 
                 // Persist order and redirect
                 dal.SaveOrder(compatibleResponse, txnId, totalAmount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture), name, email, mobile);
 
-                string paymentUrl = orderResponse.payment_url?.ToString();
+                string paymentUrl = "~/Pages/payment_detail.aspx";
                 if (!string.IsNullOrEmpty(paymentUrl))
                 {
-                    Response.Redirect(paymentUrl);
-                    Context.ApplicationInstance.CompleteRequest(); // avoid ThreadAbortException
+                Session["Assign"] = true;
+                Response.Redirect(paymentUrl, false); // IMPORTANT
+                Context.ApplicationInstance.CompleteRequest(); // avoid ThreadAbortException
                     return;
                 }
                 else
                 {
                     Response.Write("<script>alert('Payment URL not received. Please try again later.');</script>");
                 }
-            }
-            else
-            {
-                // Feedback to user (simple alert)
-                Response.Write("<script>alert('Order creation failed. Please try again later.');</script>");
-            }
+            
         }
         catch (Exception ex)
-        {
+            {
             Response.Write("<script>alert('Something went wrong. Please try again later.');</script>");
         }
     }
@@ -661,58 +657,41 @@ public partial class Portal_IpStock : System.Web.UI.Page
 
 
             // Get customer info from session
-            string name = Session["CustomerName"]?.ToString() ?? "Guest";
-            string email = Session["Email"]?.ToString() ?? "guest@example.com";
+            string name = ddlUser.SelectedItem.Text;
+            string email = ddlUser.SelectedItem.Text;
             string mobile = "9132678956"; // Or get from session/form
-
-            string redirectUrl = "https://cosmosrecogserver.com/Pages/payment_detail";
 
             DAL dal = new DAL();
 
-            // Create order using Pay0.shop API
-            var orderResponse = await CreatePay0OrderAsync(
-                mobile,
-                name,
-                amount,
-                txnId,
-                redirectUrl,
-                $"Plan #{planId} - {ramSelected}GB RAM - {ipv4Count} IPv4"
-            );
-
-            if (orderResponse != null && orderResponse.status)
-            {
+           
                 // Create a compatible response object for the existing SaveOrder method
                 var compatibleResponse = new PaymentGatewayHelper.CreateOrderResponse
                 {
                     status = true,
-                    msg = orderResponse.message,
+                    msg = "Smart VPS Assigning",
                     data = new PaymentGatewayHelper.OrderData
                     {
-                        payment_url = orderResponse.payment_url?.ToString() ?? ""
+                        payment_url = "~/Pages/payment_detail.aspx"
                     }
                 };
 
                 // Save in DB
                 dal.SaveOrder(compatibleResponse, txnId, amount, name, email, mobile);
 
-                string paymentUrl = orderResponse.payment_url?.ToString();
+                string paymentUrl = "~/Pages/payment_detail.aspx";
                 if (!string.IsNullOrEmpty(paymentUrl))
                 {
-                    // Redirect user to payment URL
-                    Response.Redirect(paymentUrl);
-                    Context.ApplicationInstance.CompleteRequest(); // prevent ThreadAbortException
+                Session["Assign"] = true;
+                // Redirect user to payment URL
+                Response.Redirect(paymentUrl, false); // IMPORTANT
+                Context.ApplicationInstance.CompleteRequest(); // prevent ThreadAbortException
                     return;
                 }
                 else
                 {
                     Response.Write("<script>alert('Payment URL not received. Please try again later.');</script>");
                 }
-            }
-            else
-            {
-                // handle failure (show message, log, etc.)
-                Response.Write("<script>alert('Order creation failed. Please try again later.');</script>");
-            }
+            
         }
     }
 

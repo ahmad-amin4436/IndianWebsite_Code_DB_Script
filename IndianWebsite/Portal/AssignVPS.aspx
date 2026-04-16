@@ -1,4 +1,4 @@
-﻿<%@ Page Title="IP Stock" Async="true" Language="C#" MasterPageFile="~/Portal.master" AutoEventWireup="true" CodeFile="IpStock.aspx.cs" Inherits="Portal_IpStock" %>
+﻿<%@ Page Title="AssignVPS" Async="true" Language="C#" MasterPageFile="~/Portal.master" AutoEventWireup="true" CodeFile="AssignVPS.aspx.cs" Inherits="Portal_AssignVPS" %>
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
     <section class="section">
@@ -28,6 +28,8 @@
                                     Text="Clear"
                                     CssClass="btn btn-secondary"
                                     OnClick="btnClear_Click" />
+                                 <asp:DropDownList ID="ddlUser" runat="server" CssClass="form-select">
+                                            </asp:DropDownList>
                             </div>
                         </div>
 
@@ -92,6 +94,7 @@
                                                 <asp:ListItem Text="16 GB" Value="16" />
                                                 <asp:ListItem Text="32 GB" Value="32" />
                                             </asp:DropDownList>
+                                            
 
                                         </div>
 
@@ -100,7 +103,7 @@
                                         <asp:HiddenField ID="hdnIpv4" runat="server" Value='<%# Eval("Ipv4") %>' />
 
                                         <asp:Button ID="btnBuyNow" runat="server"
-                                            Text="Buy Now"
+                                            Text="Assign Now"
                                             CssClass="btn btn-primary w-100 mt-2"
                                             CommandName="BuyNow"
                                             CommandArgument='<%# Eval("Id") %>' />
@@ -182,6 +185,7 @@
     <asp:ListItem Text="32 GB" Value="32" />
     <asp:ListItem Text="64 GB" Value="64" />
 </asp:DropDownList>
+                                           
                                         </div>
 
                                         <asp:HiddenField ID="hdnHostPID" runat="server" Value='<%# Eval("PID") %>' />
@@ -194,7 +198,7 @@ Total Price
     ₹<%# Eval("PricePerUnit") %>
 </span>
                                         <asp:Button ID="btnHostBuyNow" runat="server"
-                                            Text="Buy Now"
+                                            Text="Assign Now"
                                             CssClass="btn btn-primary w-100 mt-2"
                                             OnClick="btnHostBuyNow_Click"
                                             CommandArgument='<%# Eval("IP") %>' />
